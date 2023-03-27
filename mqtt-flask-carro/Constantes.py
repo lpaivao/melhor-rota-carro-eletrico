@@ -1,0 +1,2 @@
+HOST_BROKER = "localhost"
+PORT_BROKER = "8000"
