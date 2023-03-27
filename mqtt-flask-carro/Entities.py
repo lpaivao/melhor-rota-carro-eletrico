@@ -27,7 +27,6 @@ class CarroEletrico:
 
 class MQTTConn:
     def __init__(self, host=Const.BROKER, port=Const.PORT_BROKER):
-        self.fila = queue.Queue()  # Fila de carros no posto
         self.host = host
         self.port = port
         self.client = mqtt.Client()
