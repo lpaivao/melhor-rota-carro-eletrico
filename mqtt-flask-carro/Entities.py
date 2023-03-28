@@ -1,3 +1,4 @@
+'''
 import paho.mqtt.client as mqtt
 import json
 import Constantes as Const
@@ -26,7 +27,7 @@ class CarroEletrico:
 
 
 class MQTTConn:
-    def __init__(self, host=Const.BROKER, port=Const.PORT_BROKER):
+    def __init__(self, host=Const.HOST_BROKER, port=Const.PORT_BROKER):
         self.host = host
         self.port = port
         self.client = mqtt.Client()
@@ -49,3 +50,5 @@ class MQTTConn:
 
     def set_callback(self, on_message_callback):
         self.client.on_message = on_message_callback
+
+'''

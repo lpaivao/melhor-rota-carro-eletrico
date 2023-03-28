@@ -1,8 +1,28 @@
 from flask import Flask, request
-import Entities as Ent
-import json
+from flask_mqtt import Mqtt
+from dotenv import load_dotenv
+import entities as Ent
+import json,os
 
 app = Flask(__name__)
+
+load_dotenv()
+
+#flask constantes
+
+
+app.config['MQTT_BROKER_URL'] = os.environ['HOST_BROKER']
+app.config['MQTT_BROKER_PORT'] = os.environ['PORT_BROKER']
+app.config['MQTT_USERNAME'] =''
+app.config['MQTT_PASSWORD'] = ''
+app.config['MQTT_KEEPALIVE'] = 5
+app.config['MQTT_TLS_ENABLE'] = False
+
+mqtt = Mqtt()
+
+
+
+
 # Chave = placa do carro
 # Valor = objeto CarroEletrico do arquivo Entities.py
 carros_dict = {}
@@ -15,6 +35,15 @@ def estado_bateria():
         response = "Bateria:{}% ".format(str(carros_dict[placa].bateria))
         return response
 
+@mqtt.on_connect()
+def handle_connection(client,userdata,flags,rc):
+    mqtt.subscribe('teste/topic')
+
+
+@mqtt.on_message()
+def handle_mqtt_menssage(client,userdata,message):
+    data = dict(topic = message.topic, paylod=message.payload.decode())
+    print(data)
 
 if __name__ == '__main__':
     carro = Ent.CarroEletrico('P1', 100, 50)
