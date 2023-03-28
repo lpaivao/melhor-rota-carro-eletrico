@@ -12,14 +12,13 @@ load_dotenv()
 
 
 app.config['MQTT_BROKER_URL'] = os.environ['HOST_BROKER']
-app.config['MQTT_BROKER_PORT'] = os.environ['PORT_BROKER']
+app.config['MQTT_BROKER_PORT'] = int(os.environ['PORT_BROKER'])
 app.config['MQTT_USERNAME'] =''
 app.config['MQTT_PASSWORD'] = ''
 app.config['MQTT_KEEPALIVE'] = 5
 app.config['MQTT_TLS_ENABLE'] = False
 
-mqtt = Mqtt()
-
+mqtt = Mqtt(app)
 
 
 
@@ -37,7 +36,7 @@ def estado_bateria():
 
 @mqtt.on_connect()
 def handle_connection(client,userdata,flags,rc):
-    mqtt.subscribe('teste/topic')
+    mqtt.subscribe('teste/teste')
 
 
 @mqtt.on_message()
@@ -46,6 +45,4 @@ def handle_mqtt_menssage(client,userdata,message):
     print(data)
 
 if __name__ == '__main__':
-    carro = Ent.CarroEletrico('P1', 100, 50)
-    carros_dict['P1'] = carro
     app.run()
