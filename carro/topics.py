@@ -1,3 +1,5 @@
 LOW_BATTERY = "low_battery"
 BETTER_STATION = "better_station"
 BATTERY_RECHARGED = "car/battery_recharged"
+ALT_STATION = "alt_station"
+FOG_CHANGE = "fog_change"

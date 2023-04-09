@@ -51,14 +51,17 @@ class Car:
         print("Conectado ao broker MQTT")
         topico_encher_bateria = f"{topics.BATTERY_RECHARGED}/{self.id_carro}"
         self.client.subscribe(topico_encher_bateria)
+        self.client.subscribe(f"{self.fog_prefix}/{self.fog_id}/{topics.FOG_CHANGE}/{self.fog_id}")
 
     def on_message(self, client, userdata, message):
         json_payload = message.payload.decode('utf-8')
         payload = json.loads(json_payload)
 
+        # Tópico de melhor posto
         if message.topic == f"{self.fog_prefix}/{self.fog_id}/{topics.BETTER_STATION}/{self.id_carro}":
             self.boolean_enviando_bateria = False
             self.melhor_posto = payload
+            print(f"Melhor posto -> {self.melhor_posto['id_posto']}")
             """
             Logo após o carro receber a resposta do melhor posto,
             ele vai se desinscrever do tópico no formato:
@@ -70,6 +73,7 @@ class Car:
 
             self.ocupar_vaga_posto(self.melhor_posto)
 
+        # Tópico de recarregar bateria
         elif message.topic == f"{topics.BATTERY_RECHARGED}/{self.id_carro}":
             contador = 30 - self.bateria
             self.bateria = int(payload["bateria"])
@@ -83,6 +87,48 @@ class Car:
             time.sleep(3)
             self.recarregando_carro = False
 
+        # Tópico de mudança de névoa
+        elif message.topic == f"{self.fog_prefix}/{self.fog_id}/{topics.FOG_CHANGE}/{self.fog_id}":
+            # Guarda topico da névoa antiga
+            old_fog_topic = f"{self.fog_prefix}/{self.fog_id}/{topics.FOG_CHANGE}/{self.fog_id}"
+            # Atualiza o id para a névoa nova
+            new_fog_id = payload["new_fog_id"]
+            self.fog_id = new_fog_id
+            # Tópico da névoa nova
+            new_fog_topic = f"{self.fog_prefix}/{self.fog_id}/{topics.FOG_CHANGE}/{self.fog_id}"
+            # Se desinscreve do tópico da névoa antiga
+            self.client.unsubscribe(old_fog_topic)
+            # Se inscreve no tópico da névoa nova
+            self.client.subscribe(new_fog_topic)
+
+
+    def encontrar_outro_posto(self, id_posto):
+        payload = {
+            "id_carro": self.id_carro,
+            "id_posto": id_posto,
+            "latitude": self.latitude,
+            "longitude": self.longitude,
+            "max_distance_per_charge": self.max_distance_per_charge
+        }
+        """
+            Quando o carro for se inscrever para receber a resposta
+            de melhor posto da névoa, o tópico vai possuir o identificador
+            da névoa e o id do carro:
+            fog/{id da névoa}/better_station/{id do carro}
+            exemplo: fog/1/better_station/1
+        """
+        topic_sub = f"{self.fog_prefix}/{self.fog_id}/{topics.BETTER_STATION}/{self.id_carro}"
+        self.client.subscribe(topic_sub)
+        self.boolean_enviando_bateria = True
+        """
+            Vai fazer a publicação no tópico com o seguinte formato:
+            fog/{id da névoa}/alt_station
+        """
+        topico_pub = f"{self.fog_prefix}/{self.fog_id}/{topics.ALT_STATION}"
+        payload = json.dumps(payload)
+        self.client.publish(topico_pub, payload)
+        print(f"Tentando encontrar outro posto disponível")
+
     def ocupar_vaga_posto(self, melhor_posto):
         # Faz o carro ocupar vaga do posto
         id_posto = str(melhor_posto["id_posto"])
@@ -92,6 +138,14 @@ class Car:
         }
         payload = json.dumps(payload)
         self.client.publish(topico_ocupar_vaga, payload)
+
+        # Tempo máximo de espera de resposta do posto
+        time.sleep(5)
+        if self.recarregando_carro:
+            print("Tempo de espera de resposta do posto atingiu o limite")
+            self.encontrar_outro_posto(id_posto)
+            # if self.recarregando_carro is True:
+            #    self.recarregando_carro = False
 
     def enviar_bateria_baixa(self):
         payload = {
@@ -118,9 +172,9 @@ class Car:
         payload = json.dumps(payload)
         self.client.publish(topico_pub, payload)
         while self.boolean_enviando_bateria:
-            # self.client.publish(topico_pub, payload)
-            time.sleep(0.5)
-            # print(f"Esperando resposta de melhor posto no tópico {topic_sub}...")
+            time.sleep(3.0)
+            print(f"Esperando resposta de melhor posto no tópico {topic_sub}...")
+            self.client.publish(topico_pub, payload)
 
     # Diminui a bateria quando o carro anda
     def diminui_bateria(self, distancia):
@@ -129,8 +183,6 @@ class Car:
         clear_screen()
         print(f"Carro se moveu! Bateria = {self.bateria}%")
         print(f"Posição atual: ({self.latitude}), ({self.longitude})")
-        if self.melhor_posto is not None:
-            print(f"Último melhor posto calculado: Posto {self.melhor_posto['id_posto']}")
 
     def parar(self):
         self.client.loop_stop()
@@ -145,9 +197,10 @@ class Car:
         self.longitude += lon
         # Calcula quantos quilômetros o carro andou
         coordenada_b = (self.latitude, self.latitude)
-        distancia = distance(coordenada_a, coordenada_b).km
-        # Retorna a distancia
-        return distancia
+        distancia = round(distance(coordenada_a, coordenada_b).km, 2)
+
+        # Diminui a vida da bateria
+        self.diminui_bateria(distancia)
 
     def run(self):
 
@@ -155,10 +208,7 @@ class Car:
             while self.bateria > 0:
                 # Simula o carro andando aleatoriamente as coordenadas
                 lat, lon = random.uniform(-0.0005, 0.0005), random.uniform(-0.0005, 0.0005)
-                distancia = round(self.mover(lat, lon), 2)
-
-                # Diminui a vida da bateria
-                self.diminui_bateria(distancia)
+                self.mover(lat, lon)
                 """
                     Verifica se a bateria está baixa e se já não 
                     tem um processamento de envio de bateria baixa
@@ -170,13 +220,12 @@ class Car:
                     while self.recarregando_carro:
                         time.sleep(0.5)
 
-
                 time.sleep(2)
         except KeyboardInterrupt:
             self.parar()
 
 
 if __name__ == '__main__':
-    carro = Car(1, 17, 200)
+    carro = Car(1, 15, 200)
     time.sleep(1)
     carro.run()
