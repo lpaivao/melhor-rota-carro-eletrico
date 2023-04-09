@@ -4,15 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="65bb9c82-510e-47e6-982c-c37b75934194" name="Changes" comment="att">
-      <change beforePath="$PROJECT_DIR$/.idea/codestream.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/codestream.xml" afterDir="false" />
+    <list default="true" id="65bb9c82-510e-47e6-982c-c37b75934194" name="Changes" comment="Ocupando vaga do melhor posto e recarregando bateria">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/carro/car.py" beforeDir="false" afterPath="$PROJECT_DIR$/carro/car.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/nevoa/fog.py" beforeDir="false" afterPath="$PROJECT_DIR$/nevoa/fog.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/nevoa/functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/nevoa/functions.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nevoa/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/nevoa/requirements.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/nevoa/topics.py" beforeDir="false" afterPath="$PROJECT_DIR$/nevoa/topics.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/posto/posto.py" beforeDir="false" afterPath="$PROJECT_DIR$/posto/posto.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -46,7 +42,7 @@
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;master&quot;,
     &quot;last_opened_file_path&quot;: &quot;/home/lucas/Documentos/redes-pbl2/carro&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;reference.settings.ide.settings.new.ui&quot;
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;
   }
 }</component>
   <component name="RecentsManager">
@@ -148,9 +144,9 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.fog" />
         <item itemvalue="Python.car" />
         <item itemvalue="Python.__init__" />
+        <item itemvalue="Python.fog" />
         <item itemvalue="Python.posto" />
       </list>
     </recent_temporary>
@@ -206,7 +202,42 @@
       <option name="project" value="LOCAL" />
       <updated>1680823239049</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="Posto finalizado e funcional">
+      <created>1681002932715</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1681002932715</updated>
+    </task>
+    <task id="LOCAL-00008" summary="Recebendo dados do posto">
+      <created>1681003017523</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1681003017523</updated>
+    </task>
+    <task id="LOCAL-00009" summary="Topicos consertados">
+      <created>1681003041812</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1681003041812</updated>
+    </task>
+    <task id="LOCAL-00010" summary="Atualizando vaga e recarregando carro">
+      <created>1681016937775</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1681016937775</updated>
+    </task>
+    <task id="LOCAL-00011" summary="Ocupando vaga do melhor posto e recarregando bateria">
+      <created>1681016971889</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1681016971889</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -224,6 +255,12 @@
     <MESSAGE value="carro recebendo melhor posto da névoa" />
     <MESSAGE value="névoa respondendo melhor posto para o carro" />
     <MESSAGE value="att" />
-    <option name="LAST_COMMIT_MESSAGE" value="att" />
+    <MESSAGE value="Posto finalizado e funcional" />
+    <MESSAGE value="nevoa recebendo informação do posto" />
+    <MESSAGE value="Recebendo dados do posto" />
+    <MESSAGE value="Topicos consertados" />
+    <MESSAGE value="Atualizando vaga e recarregando carro" />
+    <MESSAGE value="Ocupando vaga do melhor posto e recarregando bateria" />
+    <option name="LAST_COMMIT_MESSAGE" value="Ocupando vaga do melhor posto e recarregando bateria" />
   </component>
 </project>
