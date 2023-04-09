@@ -8,7 +8,7 @@ import json
 # fila = quantos carros tem na fila
 # espera = tempo de espera
 postos_disponiveis = {
-    '0': {'id_posto': 0, 'latitude': -23.5440, 'longitude': -46.6340, 'fila': 5, 'vaga': True},
+    '0': {'id_posto': 0, 'latitude': -23.5440, 'longitude': -46.6340, 'fila': 0, 'vaga': True},
     '1': {'id_posto': 1, 'latitude': -23.5450, 'longitude': -46.6350, 'fila': 2, 'vaga': True},
     '2': {'id_posto': 2, 'latitude': -23.5560, 'longitude': -46.6360, 'fila': 3, 'vaga': True}
 }
@@ -57,6 +57,7 @@ class Fog:
                     id_posto = str(msg["id_posto"])
                     vaga = msg["vaga"]
                     self.postos[id_posto]["vaga"] = vaga
+                    self.postos[id_posto]["vaga"] = vaga
 
                 if topic[2] == topics.LOW_BATTERY:
                     id_carro = msg["id_carro"]
@@ -84,7 +85,7 @@ class Fog:
     def subscribe_all_stations(self):
         for posto in self.postos:
             self.client.subscribe(f'{self.fog_prefix}/{self.fog_id}/vaga_status/{self.postos[posto]["id_posto"]}')
-            self.client.subscribe(f'{self.fog_prefix}/{self.fog_id}/incrise_line/{self.postos[posto]["id_posto"]}')
+            # self.client.subscribe(f'{self.fog_prefix}/{self.fog_id}/incrise_line/{self.postos[posto]["id_posto"]}')
             self.client.subscribe(f'{self.fog_prefix}/{self.fog_id}/alocando_carro/{self.postos[posto]["id_posto"]}')
 
         print("Inscrito em todos os postos")
