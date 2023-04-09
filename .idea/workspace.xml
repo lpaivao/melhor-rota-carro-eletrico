@@ -4,8 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="65bb9c82-510e-47e6-982c-c37b75934194" name="Changes" comment="Ocupando vaga do melhor posto e recarregando bateria">
+    <list default="true" id="65bb9c82-510e-47e6-982c-c37b75934194" name="Changes" comment="att">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/carro/car.py" beforeDir="false" afterPath="$PROJECT_DIR$/carro/car.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/carro/topics.py" beforeDir="false" afterPath="$PROJECT_DIR$/carro/topics.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/nevoa/fog.py" beforeDir="false" afterPath="$PROJECT_DIR$/nevoa/fog.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/nevoa/functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/nevoa/functions.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/nevoa/topics.py" beforeDir="false" afterPath="$PROJECT_DIR$/nevoa/topics.py" afterDir="false" />
@@ -57,7 +59,28 @@
       <recent name="$PROJECT_DIR$/project" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.fog">
+  <component name="RunManager" selected="Python.car">
+    <configuration name="__init__ (1)" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="redes-pbl2" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/nevoa" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/nevoa/__init__.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="__init__" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="redes-pbl2" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -144,9 +167,10 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.car" />
         <item itemvalue="Python.__init__" />
+        <item itemvalue="Python.car" />
         <item itemvalue="Python.fog" />
+        <item itemvalue="Python.__init__ (1)" />
         <item itemvalue="Python.posto" />
       </list>
     </recent_temporary>
@@ -237,7 +261,21 @@
       <option name="project" value="LOCAL" />
       <updated>1681016971889</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="Recebendo aviso de vaga disponível do posto">
+      <created>1681017025769</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1681017025769</updated>
+    </task>
+    <task id="LOCAL-00013" summary="att">
+      <created>1681017030906</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1681017030906</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -254,13 +292,14 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="carro recebendo melhor posto da névoa" />
     <MESSAGE value="névoa respondendo melhor posto para o carro" />
-    <MESSAGE value="att" />
     <MESSAGE value="Posto finalizado e funcional" />
     <MESSAGE value="nevoa recebendo informação do posto" />
     <MESSAGE value="Recebendo dados do posto" />
     <MESSAGE value="Topicos consertados" />
     <MESSAGE value="Atualizando vaga e recarregando carro" />
     <MESSAGE value="Ocupando vaga do melhor posto e recarregando bateria" />
-    <option name="LAST_COMMIT_MESSAGE" value="Ocupando vaga do melhor posto e recarregando bateria" />
+    <MESSAGE value="Recebendo aviso de vaga disponível do posto" />
+    <MESSAGE value="att" />
+    <option name="LAST_COMMIT_MESSAGE" value="att" />
   </component>
 </project>
