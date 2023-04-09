@@ -36,6 +36,10 @@ class Fog:
         print(f'Conectado ao Broker! Código de retorno {rc}')
         client.subscribe(f"{self.fog_prefix}/{self.fog_id}/{topics.LOW_BATTERY}")
         client.subscribe(f"{self.fog_prefix}/{self.fog_id}/{topics.BETTER_STATION}")
+        client.subscribe(f"{self.fog_prefix}/{self.fog_id}/{topics.ALT_STATION}")
+
+        client.subscribe(f"{self.fog_prefix}/{self.fog_id}/{topics.FOG_CHANGE}")
+        client.subscribe(f"{self.fog_prefix}/{self.fog_id}/{topics.CLOUD_RESPONSE_FOG}")
         self.ponto_central = functions.calcular_ponto_central(self.postos)
         print(f"A localização central é: {self.ponto_central.latitude}, {self.ponto_central.longitude}")
         self.subscribe_all_stations()
@@ -45,30 +49,34 @@ class Fog:
         # Decodifica a mensagem e transforma o objeto JSON em string python
         msg = message.payload.decode()
         msg = json.loads(msg)
-        print(f"mensagem recebida:{msg}")
+        # print(message.topic)
+        # print(f"mensagem recebida:{msg}")
 
         if topic[0] == str(self.fog_prefix):
+
             if topic[1] == str(self.fog_id):
+
                 if topic[2] == "vaga_status":
                     id_posto = str(msg["id_posto"])
                     fila = msg["fila"]
                     self.postos[id_posto]["fila"] = fila
+
                 elif topic[2] == "alocando_carro":
                     id_posto = str(msg["id_posto"])
                     vaga = msg["vaga"]
                     self.postos[id_posto]["vaga"] = vaga
                     self.postos[id_posto]["vaga"] = vaga
 
-                if topic[2] == topics.LOW_BATTERY:
+                elif topic[2] == topics.LOW_BATTERY:
                     id_carro = msg["id_carro"]
                     latitude = msg["latitude"]
                     longitude = msg["longitude"]
                     max_distance_per_charge = msg["max_distance_per_charge"]
                     nome_mais_proximo, posto_mais_proximo, distancia_mais_proximo = \
                         functions.calcular_posto_mais_proximo_menor_fila(self.postos,
-                                                                          latitude,
-                                                                          longitude,
-                                                                          max_distance_per_charge)
+                                                                         latitude,
+                                                                         longitude,
+                                                                         max_distance_per_charge)
 
                     # Transforma em objeto json
                     payload = json.dumps(posto_mais_proximo)
@@ -82,6 +90,62 @@ class Fog:
                     topico_pub = f"{self.fog_prefix}/{self.fog_id}/{topics.BETTER_STATION}/{id_carro}"
                     client.publish(topico_pub, payload)
 
+                elif topic[2] == topics.ALT_STATION:
+                    id_carro = msg["id_carro"]
+                    id_posto = msg["id_posto"]
+                    latitude = msg["latitude"]
+                    longitude = msg["longitude"]
+                    max_distance_per_charge = msg["max_distance_per_charge"]
+                    posto_disponivel = \
+                        functions.calcular_posto_disponivel(self.postos,
+                                                            id_posto,
+                                                            latitude,
+                                                            longitude,
+                                                            max_distance_per_charge)
+
+                    # Transforma em objeto json
+                    payload = json.dumps(posto_disponivel)
+                    """
+                        Quando a névoa fizer publish para o carro com bateria baixa,
+                        ele vai responder no topico que contém o identificador da névoa
+                        e o id do carro:
+                        fog/{id da névoa}/better_station/{id do carro}
+                        exemplo: fog/1/better_station/1
+                    """
+                    topico_pub = f"{self.fog_prefix}/{self.fog_id}/{topics.BETTER_STATION}/{id_carro}"
+                    client.publish(topico_pub, payload)
+
+                elif topic[2] == topics.FOG_CHANGE:
+                    id_carro = msg["id_carro"]
+                    latitude = msg["latitude"]
+                    longitude = msg["longitude"]
+                    max_distance_per_charge = msg["max_distance_per_charge"]
+
+                    payload = {
+                        "id_carro": id_carro,
+                        "latitude": latitude,
+                        "longitude": longitude,
+                        "max_distance_per_charge": max_distance_per_charge,
+                        "fog_id": self.fog_id,
+                        "ponto_central": self.ponto_central
+                    }
+
+                    payload = json.dumps(payload)
+                    topic_pub = f"cloud/{topics.FOG_CHANGE}"
+                    self.client.publish(topic_pub, payload)
+
+                elif topic[2] == topics.CLOUD_RESPONSE_FOG:
+                    id_carro = msg["id_carro"]
+                    new_fog_id = msg["new_fog_id"]
+                    payload = {
+                        "id_carro": id_carro,
+                        "new_fog_id": new_fog_id,
+                    }
+
+                    payload = json.dumps(payload)
+                    topic_pub = f"{self.fog_prefix}/{self.fog_id}/{topics.FOG_CHANGE}/{self.fog_id}"
+                    self.client.publish(topic_pub, payload)
+
     def subscribe_all_stations(self):
         for posto in self.postos:
             self.client.subscribe(f'{self.fog_prefix}/{self.fog_id}/vaga_status/{self.postos[posto]["id_posto"]}')
@@ -89,6 +153,7 @@ class Fog:
             self.client.subscribe(f'{self.fog_prefix}/{self.fog_id}/alocando_carro/{self.postos[posto]["id_posto"]}')
 
         print("Inscrito em todos os postos")
+
 
 if __name__ == '__main__':
     fog = Fog()

@@ -62,6 +62,32 @@ def calcular_posto_mais_proximo_menor_fila(postos, latitude, longitude, max_dist
     return nome_mais_proximo, posto_mais_proximo, distancia_mais_proximo
 
 
+def calcular_posto_disponivel(postos, id_posto, latitude, longitude, max_distance_per_charge):
+    """
+    Encontra o posto de carregamento mais próximo com disponibilidade
+    """
+    posto_mais_proximo = None
+
+    if postos:
+        for posto in postos:
+            # Calcula a distância em km do carro para o posto utilizando as latitudes e longitudes
+            distancia = geodesic((latitude, longitude),
+                                 (postos[posto]["latitude"], postos[posto]["longitude"])).km
+
+            if posto_mais_proximo is None and postos[posto]["vaga"] == True:
+                if postos[posto]["id_posto"] is not int(id_posto):
+                    posto_mais_proximo = postos[posto]
+            else:
+                # Se a distância for menor que a distância que o carro percorre com a bateria toda carregada
+                # e o tempo de espera for o menor, atualiza o posto mais próximo
+
+                if postos[posto]["vaga"] is True and str(postos[posto]["id_posto"]) is not int(id_posto):
+                    if distancia <= max_distance_per_charge and postos[posto]["fila"] < posto_mais_proximo['fila']:
+                        posto_mais_proximo = postos[posto]
+
+    return posto_mais_proximo
+
+
 """
 Função para calcular o ponto central dado as coordenadas de vários postos
 """
