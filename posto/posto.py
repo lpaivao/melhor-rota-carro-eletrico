@@ -17,10 +17,10 @@ class Posto:
         self.client.on_message = self.on_message
         self.client.connect(BROKER_HOST, BROKER_PORT, 60)
 
-        self.__STATUS = f'Nevoa/{self.ID_NEVOA}/Vaga_status/{self.ID_POSTO}'
+        self.__STATUS = f'fog/{self.ID_NEVOA}/vaga_status/{self.ID_POSTO}'
         #self.__BETTER_STATION = f'Nevoa/{self.ID_NEVOA}/Better_station'
-        self.__INCRISE_LINE = f'Nevoa/{self.ID_NEVOA}/Incrise_line/{self.ID_POSTO}'
-        self.__ALOC = f'Nevoa/{self.ID_NEVOA}/Alocando_carro/{self.ID_POSTO}'
+        self.__INCRISE_LINE = f'fog/{self.ID_NEVOA}/incrise_line/{self.ID_POSTO}'
+        self.__ALOC = f'fog/{self.ID_NEVOA}/alocando_carro/{self.ID_POSTO}'
 
         schedule.every(0.5).minutes.do(self.subtrair_fila)
         schedule.every(0.5).minutes.do(self.publish_status)
@@ -48,7 +48,7 @@ class Posto:
         topic = message.topic.split("/")
         msg = message.payload.decode()
 
-        if topic[2] == "Incrise_line":
+        if topic[2] == "incrise_line":
             self.fila += 1
             print(self.fila)
             self.client.publish(self.__ALOC,json.dumps({
