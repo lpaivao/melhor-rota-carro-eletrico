@@ -6,8 +6,16 @@ from geopy.distance import geodesic
 from geopy.distance import distance
 import topics
 import threading
+import os
 
-posto = {'latitude': -23.5440, 'longitude': -46.6340, 'fila': 5, 'espera': 5}
+
+def clear_screen():
+    os.system('cls' if os.name == 'nt' else 'clear')
+
+
+os.environ['TERM'] = 'xterm'
+
+posto = {'id_posto': 0, 'latitude': -23.5440, 'longitude': -46.6340, 'fila': 5, 'vaga': True}
 
 
 class Car:
@@ -24,6 +32,9 @@ class Car:
         # Distância máxima que o carro pode percorrer com carga máxima
         self.max_distance_per_charge = max_distance_per_charge
 
+        # Variável de controle para controlar o carro recarregando
+        self.recarregando_carro = False
+
         self.id_carro = id_carro
         self.latitude = latitude
         self.longitude = longitude
@@ -38,6 +49,8 @@ class Car:
 
     def on_connect(self, client, userdata, flags, rc):
         print("Conectado ao broker MQTT")
+        topico_encher_bateria = f"{topics.BATTERY_RECHARGED}/{self.id_carro}"
+        self.client.subscribe(topico_encher_bateria)
 
     def on_message(self, client, userdata, message):
         json_payload = message.payload.decode('utf-8')
@@ -46,7 +59,6 @@ class Car:
         if message.topic == f"{self.fog_prefix}/{self.fog_id}/{topics.BETTER_STATION}/{self.id_carro}":
             self.boolean_enviando_bateria = False
             self.melhor_posto = payload
-            print(f"Melhor posto -> {self.melhor_posto}")
             """
             Logo após o carro receber a resposta do melhor posto,
             ele vai se desinscrever do tópico no formato:
@@ -56,6 +68,31 @@ class Car:
             """
             self.client.unsubscribe(f"{self.fog_prefix}/{self.fog_id}/{topics.BETTER_STATION}/{self.id_carro}")
 
+            self.ocupar_vaga_posto(self.melhor_posto)
+
+        elif message.topic == f"{topics.BATTERY_RECHARGED}/{self.id_carro}":
+            contador = 30 - self.bateria
+            self.bateria = int(payload["bateria"])
+            self.latitude = payload["latitude"]
+            self.longitude = payload["longitude"]
+            for i in range(contador, 0, -1):
+                print(f"Aguarde {i} segundos, recarregando o carro no Posto {self.melhor_posto['id_posto']}...")
+                time.sleep(1)
+                clear_screen()
+            print("Carro recarregado! Bateria em 100%")
+            time.sleep(3)
+            self.recarregando_carro = False
+
+    def ocupar_vaga_posto(self, melhor_posto):
+        # Faz o carro ocupar vaga do posto
+        id_posto = str(melhor_posto["id_posto"])
+        topico_ocupar_vaga = f"{self.fog_prefix}/{self.fog_id}/incrise_line/{id_posto}"
+        payload = {
+            "id_carro": self.id_carro
+        }
+        payload = json.dumps(payload)
+        self.client.publish(topico_ocupar_vaga, payload)
+
     def enviar_bateria_baixa(self):
         payload = {
             "id_carro": self.id_carro,
@@ -63,12 +100,6 @@ class Car:
             "longitude": self.longitude,
             "max_distance_per_charge": self.max_distance_per_charge
         }
-        """
-            Vai fazer a publicação no tópico com o seguinte formato:
-            fog/{id da névoa}/low_battery
-        """
-        topico_pub = f"{self.fog_prefix}/{self.fog_id}/{topics.LOW_BATTERY}"
-        payload = json.dumps(payload)
         """
             Quando o carro for se inscrever para receber a resposta
             de melhor posto da névoa, o tópico vai possuir o identificador
@@ -79,15 +110,27 @@ class Car:
         topic_sub = f"{self.fog_prefix}/{self.fog_id}/{topics.BETTER_STATION}/{self.id_carro}"
         self.client.subscribe(topic_sub)
         self.boolean_enviando_bateria = True
+        """
+            Vai fazer a publicação no tópico com o seguinte formato:
+            fog/{id da névoa}/low_battery
+        """
+        topico_pub = f"{self.fog_prefix}/{self.fog_id}/{topics.LOW_BATTERY}"
+        payload = json.dumps(payload)
+        self.client.publish(topico_pub, payload)
         while self.boolean_enviando_bateria:
-            print(f"Esperando resposta de melhor posto em {topic_sub}...")
-            self.client.publish(topico_pub, payload)
-            time.sleep(4)
+            # self.client.publish(topico_pub, payload)
+            time.sleep(0.5)
+            # print(f"Esperando resposta de melhor posto no tópico {topic_sub}...")
 
     # Diminui a bateria quando o carro anda
     def diminui_bateria(self, distancia):
-        self.bateria -= round(distancia / self.max_distance_per_charge * 100, 2)
-        # print(f"Bateria = {self.bateria}")
+        # self.bateria -= round(distancia / self.max_distance_per_charge * 100, 2)
+        self.bateria -= 1
+        clear_screen()
+        print(f"Carro se moveu! Bateria = {self.bateria}%")
+        print(f"Posição atual: ({self.latitude}), ({self.longitude})")
+        if self.melhor_posto is not None:
+            print(f"Último melhor posto calculado: Posto {self.melhor_posto['id_posto']}")
 
     def parar(self):
         self.client.loop_stop()
@@ -123,6 +166,10 @@ class Car:
                 if self.bateria < 15 and not self.boolean_enviando_bateria:
                     thread = threading.Thread(target=self.enviar_bateria_baixa)
                     thread.start()
+                    self.recarregando_carro = True
+                    while self.recarregando_carro:
+                        time.sleep(0.5)
+
 
                 time.sleep(2)
         except KeyboardInterrupt:
@@ -130,6 +177,6 @@ class Car:
 
 
 if __name__ == '__main__':
-    carro = Car(1, 15, 200)
+    carro = Car(1, 17, 200)
     time.sleep(1)
     carro.run()
