@@ -11,10 +11,12 @@ posto = {'latitude': -23.5440, 'longitude': -46.6340, 'fila': 5, 'espera': 5}
 
 
 class Car:
-    def __init__(self, fog_prefix, id_carro, bateria, max_distance_per_charge, melhor_posto=posto, latitude=-23.5450,
-                 longitude=-46.6355):
+    def __init__(self, id_carro, bateria, max_distance_per_charge, melhor_posto=posto, latitude=-23.5450,
+                 longitude=-46.6355, fog_prefix="fog", fog_id=1):
         # Prefixo de qual nuvem o carro está no momento
         self.fog_prefix = fog_prefix
+        # ID na nevoa
+        self.fog_id = fog_id
         # Dicionário com as informações do melhor posto desde a última solicitação
         self.melhor_posto = melhor_posto
         # Variável booleana para indicar se tem um processo de envio de bateria baixa acontecendo
@@ -41,18 +43,18 @@ class Car:
         json_payload = message.payload.decode('utf-8')
         payload = json.loads(json_payload)
 
-        if message.topic == f"{self.fog_prefix}/{topics.BETTER_STATION}/{self.id_carro}":
+        if message.topic == f"{self.fog_prefix}/{self.fog_id}/{topics.BETTER_STATION}/{self.id_carro}":
             self.boolean_enviando_bateria = False
             self.melhor_posto = payload
             print(f"Melhor posto -> {self.melhor_posto}")
             """
             Logo após o carro receber a resposta do melhor posto,
             ele vai se desinscrever do tópico no formato:
-            {nome da névoa}/better_station/{id do carro},
+            fog/{id da névoa}/better_station/{id do carro},
             pois caso seja necessário ele mudar de névoa, ele não estará inscrito
             no tópico de uma névoa antiga
             """
-            self.client.unsubscribe(f"{self.fog_prefix}/{topics.BETTER_STATION}/{self.id_carro}")
+            self.client.unsubscribe(f"{self.fog_prefix}/{self.fog_id}/{topics.BETTER_STATION}/{self.id_carro}")
 
     def enviar_bateria_baixa(self):
         payload = {
@@ -63,23 +65,23 @@ class Car:
         }
         """
             Vai fazer a publicação no tópico com o seguinte formato:
-            fog1/low_battery
+            fog/{id da névoa}/low_battery
         """
-        topico_pub = f"{self.fog_prefix}/{topics.LOW_BATTERY}"
-        response = json.dumps(payload)
+        topico_pub = f"{self.fog_prefix}/{self.fog_id}/{topics.LOW_BATTERY}"
+        payload = json.dumps(payload)
         """
             Quando o carro for se inscrever para receber a resposta
             de melhor posto da névoa, o tópico vai possuir o identificador
             da névoa e o id do carro:
-            {nome da névoa}/better_station/{id do carro}
-            exemplo: fog1/better_station/1 
+            fog/{id da névoa}/better_station/{id do carro}
+            exemplo: fog/1/better_station/1
         """
-        topic_sub = f"{self.fog_prefix}/{topics.BETTER_STATION}/{self.id_carro}"
+        topic_sub = f"{self.fog_prefix}/{self.fog_id}/{topics.BETTER_STATION}/{self.id_carro}"
         self.client.subscribe(topic_sub)
         self.boolean_enviando_bateria = True
         while self.boolean_enviando_bateria:
             print(f"Esperando resposta de melhor posto em {topic_sub}...")
-            self.client.publish(topico_pub, response)
+            self.client.publish(topico_pub, payload)
             time.sleep(4)
 
     # Diminui a bateria quando o carro anda
@@ -128,6 +130,6 @@ class Car:
 
 
 if __name__ == '__main__':
-    carro = Car("fog1", 1, 15, 200)
+    carro = Car(1, 15, 200)
     time.sleep(1)
     carro.run()
