@@ -5,6 +5,8 @@ import topics
 import functions
 import json
 import socket
+import threading
+import datetime
 
 # fila = quantos carros tem na fila
 # espera = tempo de espera
@@ -16,7 +18,7 @@ postos_disponiveis = {
 
 
 class Fog:
-    def __init__(self, fog_prefix="fog", fog_id=1, postos=postos_disponiveis,host = 'localhost',http_port=8080,http_host='localhost'):
+    def __init__(self, fog_prefix="fog", fog_id=1, postos=postos_disponiveis, host='localhost', http_port=65136, http_host='localhost'):
         # Prefixo de qual nuvem o carro está no momento
         self.fog_prefix = fog_prefix
         # ID na nevoa
@@ -35,18 +37,28 @@ class Fog:
         self.client.on_message = self.on_message
         self.client.connect(host, 1883, 60)
         # self.client.loop_start()
+
+        self.connection_thread = threading.Thread(
+            target=self._connect_to_cloud, args=[])
+        self.connection_thread.start()
         self.client.loop_forever()
 
     def on_connect(self, client, userdata, flags, rc):
         print(f'Conectado ao Broker! Código de retorno {rc}')
-        client.subscribe(f"{self.fog_prefix}/{self.fog_id}/{topics.LOW_BATTERY}")
-        client.subscribe(f"{self.fog_prefix}/{self.fog_id}/{topics.BETTER_STATION}")
-        client.subscribe(f"{self.fog_prefix}/{self.fog_id}/{topics.ALT_STATION}")
+        client.subscribe(
+            f"{self.fog_prefix}/{self.fog_id}/{topics.LOW_BATTERY}")
+        client.subscribe(
+            f"{self.fog_prefix}/{self.fog_id}/{topics.BETTER_STATION}")
+        client.subscribe(
+            f"{self.fog_prefix}/{self.fog_id}/{topics.ALT_STATION}")
 
-        client.subscribe(f"{self.fog_prefix}/{self.fog_id}/{topics.FOG_CHANGE}")
-        client.subscribe(f"{self.fog_prefix}/{self.fog_id}/{topics.CLOUD_RESPONSE_FOG}")
+        client.subscribe(
+            f"{self.fog_prefix}/{self.fog_id}/{topics.FOG_CHANGE}")
+        client.subscribe(
+            f"{self.fog_prefix}/{self.fog_id}/{topics.CLOUD_RESPONSE_FOG}")
         self.ponto_central = functions.calcular_ponto_central(self.postos)
-        print(f"A localização central é: {self.ponto_central.latitude}, {self.ponto_central.longitude}")
+        print(
+            f"A localização central é: {self.ponto_central.latitude}, {self.ponto_central.longitude}")
         self.subscribe_all_stations()
 
     def on_message(self, client, data, message):
@@ -153,35 +165,44 @@ class Fog:
 
     def subscribe_all_stations(self):
         for posto in self.postos:
-            self.client.subscribe(f'{self.fog_prefix}/{self.fog_id}/vaga_status/{self.postos[posto]["id_posto"]}')
+            self.client.subscribe(
+                f'{self.fog_prefix}/{self.fog_id}/vaga_status/{self.postos[posto]["id_posto"]}')
             # self.client.subscribe(f'{self.fog_prefix}/{self.fog_id}/incrise_line/{self.postos[posto]["id_posto"]}')
-            self.client.subscribe(f'{self.fog_prefix}/{self.fog_id}/alocando_carro/{self.postos[posto]["id_posto"]}')
+            self.client.subscribe(
+                f'{self.fog_prefix}/{self.fog_id}/alocando_carro/{self.postos[posto]["id_posto"]}')
 
         print("Inscrito em todos os postos")
 
-    def http_connect(self):
-        self.server = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-        self.server.connect(self.http_host,self.http_port)
+    def _connect_to_cloud(self):
+        current_time = datetime.datetime.now()
+        print(f"[{current_time}] - Connected to cloud")
+        self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.server.connect((self.http_host, self.http_port))
 
-    def send_car_request_change_fog(self,request):
+    def send_car_request_change_fog(self, request):
         self.server.sendall(request.encode())
-    
-    def recive_car_request_change_fog(self,request):
+
+    def recive_car_request_change_fog(self, request):
         response = self.server.recv(1024)
         return response.decode()
-    
-    def car_request(self,id_carro,latitude,longitude,max_distance_per_charge):
+
+    def car_request(self, id_carro, latitude, longitude, max_distance_per_charge):
         payload = {
-                        "id_carro": id_carro,
-                        "latitude": latitude,
-                        "longitude": longitude,
-                        "max_distance_per_charge": max_distance_per_charge,
-                        "fog_id": self.fog_id,
-                        "ponto_central": self.ponto_central
-                    }
-        payload = json.dumps(payload,separators=(',',':'),indent='\t')
+            "id_carro": id_carro,
+            "latitude": latitude,
+            "longitude": longitude,
+            "max_distance_per_charge": max_distance_per_charge,
+            "fog_id": self.fog_id,
+            "ponto_central": self.ponto_central
+        }
+        payload = json.dumps(payload, separators=(',', ':'), indent='\t')
         size = len(payload)
         request = f'POST /cadCliente HTTP/1.1\r\nHost: {self.host}:{self.http_port}\r\nUser-Agent: EsquivelWindows10NT/2022.7.5\r\nContent-Type: application/json\r\nAccept: */*\r\nContent-Length: {size}\r\n\r\n{payload}'
         return request
+
+    def __del__(self):
+        self.connection_thread.join()
+
+
 if __name__ == '__main__':
     fog = Fog()
