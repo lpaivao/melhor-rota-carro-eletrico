@@ -16,7 +16,7 @@ postos_disponiveis = {
 
 
 class Fog:
-    def __init__(self, fog_prefix="fog", fog_id=1, postos=postos_disponiveis,host = 'localhost',http_port=8080):
+    def __init__(self, fog_prefix="fog", fog_id=1, postos=postos_disponiveis,host = 'localhost',http_port=8080,http_host='localhost'):
         # Prefixo de qual nuvem o carro está no momento
         self.fog_prefix = fog_prefix
         # ID na nevoa
@@ -26,6 +26,7 @@ class Fog:
         # Ponto central entre todos os postos
         self.ponto_central = None
         self.host = host
+        self.http_host = http_host
         self.http_port = http_port
         self.server = None
 
@@ -160,7 +161,7 @@ class Fog:
 
     def http_connect(self):
         self.server = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-        self.server.connect(self.host,self.http_port)
+        self.server.connect(self.http_host,self.http_port)
 
     def send_car_request_change_fog(self,request):
         self.server.sendall(request.encode())
