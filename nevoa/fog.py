@@ -4,6 +4,7 @@ from random import randint
 import topics
 import functions
 import json
+import socket
 
 # fila = quantos carros tem na fila
 # espera = tempo de espera
@@ -15,7 +16,7 @@ postos_disponiveis = {
 
 
 class Fog:
-    def __init__(self, fog_prefix="fog", fog_id=1, postos=postos_disponiveis):
+    def __init__(self, fog_prefix="fog", fog_id=1, postos=postos_disponiveis,host = 'localhost',http_port=8080):
         # Prefixo de qual nuvem o carro está no momento
         self.fog_prefix = fog_prefix
         # ID na nevoa
@@ -24,11 +25,14 @@ class Fog:
         self.postos = postos
         # Ponto central entre todos os postos
         self.ponto_central = None
+        self.host = host
+        self.http_port = http_port
+        self.server = None
 
         self.client = mqtt.Client()
         self.client.on_connect = self.on_connect
         self.client.on_message = self.on_message
-        self.client.connect("localhost", 1883, 60)
+        self.client.connect(host, 1883, 60)
         # self.client.loop_start()
         self.client.loop_forever()
 
@@ -154,6 +158,29 @@ class Fog:
 
         print("Inscrito em todos os postos")
 
+    def http_connect(self):
+        self.server = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+        self.server.connect(self.host,self.http_port)
 
+    def send_car_request_change_fog(self,request):
+        self.server.sendall(request.encode())
+    
+    def recive_car_request_change_fog(self,request):
+        response = self.server.recv(1024)
+        return response.decode()
+    
+    def car_request(self,id_carro,latitude,longitude,max_distance_per_charge):
+        payload = {
+                        "id_carro": id_carro,
+                        "latitude": latitude,
+                        "longitude": longitude,
+                        "max_distance_per_charge": max_distance_per_charge,
+                        "fog_id": self.fog_id,
+                        "ponto_central": self.ponto_central
+                    }
+        payload = json.dumps(payload,separators=(',',':'),indent='\t')
+        size = len(payload)
+        request = f'POST /cadCliente HTTP/1.1\r\nHost: {self.host}:{self.http_port}\r\nUser-Agent: EsquivelWindows10NT/2022.7.5\r\nContent-Type: application/json\r\nAccept: */*\r\nContent-Length: {size}\r\n\r\n{payload}'
+        return request
 if __name__ == '__main__':
     fog = Fog()

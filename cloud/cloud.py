@@ -15,12 +15,12 @@ def hello():
                     "error": False
                     })
 
-
 class Cloud:
-    def __init__(self, host, port, timeout):
+    def __init__(self, host='localhost', port=1883, timeout=30,http_port=8080):
         self.fog_prefix = "fog"
         self._host = host
         self._port = port
+       
         self._fognodes = {}
         # Colocar uma queue de verdade (se tiver de usar uma queue!). Pode até ser priority(o comando a ser executado mais rapudo é o que tem o carro com menor bateria)
         self._command_queue = {}
