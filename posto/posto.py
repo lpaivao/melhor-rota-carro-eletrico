@@ -36,6 +36,7 @@ class Posto:
             time.sleep(1)
 
     def on_connect(self,client,usardata,flags,rc):
+        print(f"Posto {self.ID_POSTO}")
         print("Conectado")
        # self.client.subscribe(self.__BETTER_STATION)
         self.client.subscribe(self.__INCRISE_LINE)
@@ -100,3 +101,5 @@ class Posto:
             print(f"subtraindo fila:{self.fila}")
 
 
+if __name__ == '__main__':
+    posto = Posto()
