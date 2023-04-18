@@ -4,13 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="65bb9c82-510e-47e6-982c-c37b75934194" name="Changes" comment="att">
+    <list default="true" id="65bb9c82-510e-47e6-982c-c37b75934194" name="Changes" comment="Nuvem mudando névoa do carro">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/carro/car.py" beforeDir="false" afterPath="$PROJECT_DIR$/carro/car.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/carro/topics.py" beforeDir="false" afterPath="$PROJECT_DIR$/carro/topics.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nevoa/fog.py" beforeDir="false" afterPath="$PROJECT_DIR$/nevoa/fog.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nevoa/functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/nevoa/functions.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nevoa/topics.py" beforeDir="false" afterPath="$PROJECT_DIR$/nevoa/topics.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -43,12 +38,13 @@
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/lucas/Documentos/redes-pbl2/carro&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/lucas/Documentos/redes-pbl2/cloud_test&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;
   }
 }</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/cloud_test" />
       <recent name="$PROJECT_DIR$/carro" />
       <recent name="$PROJECT_DIR$/project" />
       <recent name="$PROJECT_DIR$/mqtt" />
@@ -59,49 +55,7 @@
       <recent name="$PROJECT_DIR$/project" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.car">
-    <configuration name="__init__ (1)" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="redes-pbl2" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/nevoa" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/nevoa/__init__.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="__init__" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="redes-pbl2" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/posto" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/posto/__init__.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
+  <component name="RunManager" selected="Python.cliente">
     <configuration name="car" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="redes-pbl2" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -115,6 +69,48 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/carro/car.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="cliente" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="redes-pbl2" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/teste sockets" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/teste sockets/cliente.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="cloud (1)" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="redes-pbl2" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/cloud/docker/cloud" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/cloud/docker/cloud/cloud.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -144,7 +140,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="posto" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="servidor" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="redes-pbl2" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -152,11 +148,11 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/posto" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/teste sockets" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/posto/posto.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/teste sockets/servidor.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -167,11 +163,11 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.__init__" />
-        <item itemvalue="Python.car" />
+        <item itemvalue="Python.cliente" />
+        <item itemvalue="Python.servidor" />
+        <item itemvalue="Python.cloud (1)" />
         <item itemvalue="Python.fog" />
-        <item itemvalue="Python.__init__ (1)" />
-        <item itemvalue="Python.posto" />
+        <item itemvalue="Python.car" />
       </list>
     </recent_temporary>
   </component>
@@ -275,7 +271,63 @@
       <option name="project" value="LOCAL" />
       <updated>1681017030906</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="Carro pedindo posto alternativo quando não recebe resposta">
+      <created>1681080414420</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1681080414420</updated>
+    </task>
+    <task id="LOCAL-00015" summary="Requisitando troca de névoa para o carro">
+      <created>1681080456710</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1681080456710</updated>
+    </task>
+    <task id="LOCAL-00016" summary="att">
+      <created>1681080461188</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1681080461188</updated>
+    </task>
+    <task id="LOCAL-00017" summary="Mudando de névoa, mas sem verificar posto alternativo">
+      <created>1681791060033</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1681791060033</updated>
+    </task>
+    <task id="LOCAL-00018" summary="Se comunicando com a nuvem por socket">
+      <created>1681791156642</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1681791156642</updated>
+    </task>
+    <task id="LOCAL-00019" summary="Consertando função">
+      <created>1681791183658</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1681791183658</updated>
+    </task>
+    <task id="LOCAL-00020" summary="att">
+      <created>1681791190612</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1681791190612</updated>
+    </task>
+    <task id="LOCAL-00021" summary="Nuvem mudando névoa do carro">
+      <created>1681791212487</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1681791212487</updated>
+    </task>
+    <option name="localTasksCounter" value="22" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -299,7 +351,13 @@
     <MESSAGE value="Atualizando vaga e recarregando carro" />
     <MESSAGE value="Ocupando vaga do melhor posto e recarregando bateria" />
     <MESSAGE value="Recebendo aviso de vaga disponível do posto" />
+    <MESSAGE value="Carro pedindo posto alternativo quando não recebe resposta" />
+    <MESSAGE value="Requisitando troca de névoa para o carro" />
+    <MESSAGE value="Mudando de névoa, mas sem verificar posto alternativo" />
+    <MESSAGE value="Se comunicando com a nuvem por socket" />
+    <MESSAGE value="Consertando função" />
     <MESSAGE value="att" />
-    <option name="LAST_COMMIT_MESSAGE" value="att" />
+    <MESSAGE value="Nuvem mudando névoa do carro" />
+    <option name="LAST_COMMIT_MESSAGE" value="Nuvem mudando névoa do carro" />
   </component>
 </project>
