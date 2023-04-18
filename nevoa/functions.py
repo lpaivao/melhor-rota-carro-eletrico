@@ -81,8 +81,8 @@ def calcular_posto_disponivel(postos, id_posto, latitude, longitude, max_distanc
                 # Se a distância for menor que a distância que o carro percorre com a bateria toda carregada
                 # e o tempo de espera for o menor, atualiza o posto mais próximo
 
-                if postos[posto]["vaga"] is True and str(postos[posto]["id_posto"]) is not int(id_posto):
-                    if distancia <= max_distance_per_charge and postos[posto]["fila"] < posto_mais_proximo['fila']:
+                if postos[posto]["vaga"] is True and postos[posto]["id_posto"] is not int(id_posto):
+                    if distancia <= int(max_distance_per_charge) and postos[posto]["fila"] < posto_mais_proximo['fila']:
                         posto_mais_proximo = postos[posto]
 
     return posto_mais_proximo
