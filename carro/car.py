@@ -1,3 +1,6 @@
+import datetime
+import socket
+
 import paho.mqtt.client as mqtt
 import json
 import random
@@ -15,7 +18,12 @@ def clear_screen():
 
 os.environ['TERM'] = 'xterm'
 
-posto = {'id_posto': 0, 'latitude': -23.5440, 'longitude': -46.6340, 'fila': 5, 'vaga': True}
+posto = {'id_posto': 0, 'latitude': -23.5440, 'longitude': -46.6340, 'fila': 0, 'vaga': True}
+
+
+# Função que será executada se o tempo limite for atingido
+def on_timeout(self):
+    print("Tempo limite de resposta excedido.")
 
 
 class Car:
@@ -29,11 +37,14 @@ class Car:
         self.melhor_posto = melhor_posto
         # Variável booleana para indicar se tem um processo de envio de bateria baixa acontecendo
         self.boolean_enviando_bateria = False
+        self.tentando_ocupar_posto = False
+        self.recarregando_carro = False
+        self.posto_respondeu = False
+        self.timer1 = None
+        self.timer2 = None
+        self.timer3 = None
         # Distância máxima que o carro pode percorrer com carga máxima
         self.max_distance_per_charge = max_distance_per_charge
-
-        # Variável de controle para controlar o carro recarregando
-        self.recarregando_carro = False
 
         self.id_carro = id_carro
         self.latitude = latitude
@@ -45,125 +56,103 @@ class Car:
         self.client.on_connect = self.on_connect
         self.client.on_message = self.on_message
         self.client.connect("localhost", 1883, 60)
+        # Socket para se comunicar com a nuvem
+        self.server = None
+
+        # Start
         self.client.loop_start()
+        # self.client.loop_forever()
 
     def on_connect(self, client, userdata, flags, rc):
         print("Conectado ao broker MQTT")
         topico_encher_bateria = f"{topics.BATTERY_RECHARGED}/{self.id_carro}"
         self.client.subscribe(topico_encher_bateria)
-        self.client.subscribe(f"{self.fog_prefix}/{self.fog_id}/{topics.FOG_CHANGE}/{self.fog_id}")
+        self.client.subscribe(f"cloud/{topics.FOG_CHANGE}/{self.id_carro}")
+        """
+            Quando o carro for se inscrever para receber a resposta
+            de melhor posto da névoa, o tópico vai possuir o identificador
+            da névoa e o id do carro:
+            fog/{id da névoa}/better_station/{id do carro}
+            exemplo: fog/1/better_station/1
+        """
+        self.client.subscribe(f"{self.fog_prefix}/{self.fog_id}/{topics.BETTER_STATION}/{self.id_carro}")
+
+        # Teste
+        # topico_ocupar_vaga = f"{self.fog_prefix}/{self.fog_id}/incrise_line/0"
+        # message = {"id_carro": 1}
+        # self.client.publish(topico_ocupar_vaga, json.dumps(message))
 
     def on_message(self, client, userdata, message):
         json_payload = message.payload.decode('utf-8')
         payload = json.loads(json_payload)
+        print(f"TOPICO:{message.topic}")
 
         # Tópico de melhor posto
         if message.topic == f"{self.fog_prefix}/{self.fog_id}/{topics.BETTER_STATION}/{self.id_carro}":
-            self.boolean_enviando_bateria = False
+            # self.boolean_enviando_bateria = False
             self.melhor_posto = payload
-            print(f"Melhor posto -> {self.melhor_posto['id_posto']}")
-            """
-            Logo após o carro receber a resposta do melhor posto,
-            ele vai se desinscrever do tópico no formato:
-            fog/{id da névoa}/better_station/{id do carro},
-            pois caso seja necessário ele mudar de névoa, ele não estará inscrito
-            no tópico de uma névoa antiga
-            """
-            self.client.unsubscribe(f"{self.fog_prefix}/{self.fog_id}/{topics.BETTER_STATION}/{self.id_carro}")
+            print(f"Posto encontrado! Tentativa de ocupar vaga do posto [{self.melhor_posto['id_posto']}]...")
 
             self.ocupar_vaga_posto(self.melhor_posto)
 
         # Tópico de recarregar bateria
         elif message.topic == f"{topics.BATTERY_RECHARGED}/{self.id_carro}":
+            self.recarregando_carro = True
+            self.tentando_ocupar_posto = False
+            self.boolean_enviando_bateria = False
             contador = 30 - self.bateria
-            self.bateria = int(payload["bateria"])
+            # self.bateria = int(payload["bateria"])
+            self.bateria = 20
             self.latitude = payload["latitude"]
             self.longitude = payload["longitude"]
-            for i in range(contador, 0, -1):
+
+            for i in range(10, 0, -1):
                 print(f"Aguarde {i} segundos, recarregando o carro no Posto {self.melhor_posto['id_posto']}...")
                 time.sleep(1)
-                clear_screen()
+                # clear_screen()
+
             print("Carro recarregado! Bateria em 100%")
-            time.sleep(3)
-            self.recarregando_carro = False
+            self.mudar_nevoa()
 
         # Tópico de mudança de névoa
-        elif message.topic == f"{self.fog_prefix}/{self.fog_id}/{topics.FOG_CHANGE}/{self.fog_id}":
-            # Guarda topico da névoa antiga
-            old_fog_topic = f"{self.fog_prefix}/{self.fog_id}/{topics.FOG_CHANGE}/{self.fog_id}"
-            # Atualiza o id para a névoa nova
-            new_fog_id = payload["new_fog_id"]
+        elif message.topic == f"cloud/{topics.FOG_CHANGE}/{self.fog_id}":
+            # Desinscreve do tópico da névoa antiga de melhor posto
+            try:
+                self.client.unsubscribe(f"{self.fog_prefix}/{self.fog_id}/{topics.BETTER_STATION}/{self.id_carro}")
+            except:
+                pass
+            # Atualiza o id da névoa
+            old_fog_id = self.fog_id
+            new_fog_id = payload["fog_id"]
             self.fog_id = new_fog_id
-            # Tópico da névoa nova
-            new_fog_topic = f"{self.fog_prefix}/{self.fog_id}/{topics.FOG_CHANGE}/{self.fog_id}"
-            # Se desinscreve do tópico da névoa antiga
-            self.client.unsubscribe(old_fog_topic)
-            # Se inscreve no tópico da névoa nova
-            self.client.subscribe(new_fog_topic)
+            print(f"Névoa atualizada!\nNévoa antiga:[{old_fog_id}] | Névoa atual:[{self.fog_id}]")
+            time.sleep(3)
+            print("Carro vai voltar a andar...")
+            self.recarregando_carro = False
 
+    def mudar_nevoa(self):
+        print("Carro vai mudar de névoa...")
 
-    def encontrar_outro_posto(self, id_posto):
         payload = {
             "id_carro": self.id_carro,
-            "id_posto": id_posto,
             "latitude": self.latitude,
             "longitude": self.longitude,
-            "max_distance_per_charge": self.max_distance_per_charge
+            "max_distance_per_charge": self.max_distance_per_charge,
         }
-        """
-            Quando o carro for se inscrever para receber a resposta
-            de melhor posto da névoa, o tópico vai possuir o identificador
-            da névoa e o id do carro:
-            fog/{id da névoa}/better_station/{id do carro}
-            exemplo: fog/1/better_station/1
-        """
-        topic_sub = f"{self.fog_prefix}/{self.fog_id}/{topics.BETTER_STATION}/{self.id_carro}"
-        self.client.subscribe(topic_sub)
-        self.boolean_enviando_bateria = True
-        """
-            Vai fazer a publicação no tópico com o seguinte formato:
-            fog/{id da névoa}/alt_station
-        """
-        topico_pub = f"{self.fog_prefix}/{self.fog_id}/{topics.ALT_STATION}"
+
+        topic_pub = f"{self.fog_prefix}/{self.fog_id}/{topics.FOG_CHANGE}"
         payload = json.dumps(payload)
-        self.client.publish(topico_pub, payload)
-        print(f"Tentando encontrar outro posto disponível")
 
-    def ocupar_vaga_posto(self, melhor_posto):
-        # Faz o carro ocupar vaga do posto
-        id_posto = str(melhor_posto["id_posto"])
-        topico_ocupar_vaga = f"{self.fog_prefix}/{self.fog_id}/incrise_line/{id_posto}"
-        payload = {
-            "id_carro": self.id_carro
-        }
-        payload = json.dumps(payload)
-        self.client.publish(topico_ocupar_vaga, payload)
+        self.client.publish(topic_pub, payload)
 
-        # Tempo máximo de espera de resposta do posto
-        time.sleep(5)
-        if self.recarregando_carro:
-            print("Tempo de espera de resposta do posto atingiu o limite")
-            self.encontrar_outro_posto(id_posto)
-            # if self.recarregando_carro is True:
-            #    self.recarregando_carro = False
+    def encontrar_posto_principal(self):
 
-    def enviar_bateria_baixa(self):
         payload = {
             "id_carro": self.id_carro,
             "latitude": self.latitude,
             "longitude": self.longitude,
             "max_distance_per_charge": self.max_distance_per_charge
         }
-        """
-            Quando o carro for se inscrever para receber a resposta
-            de melhor posto da névoa, o tópico vai possuir o identificador
-            da névoa e o id do carro:
-            fog/{id da névoa}/better_station/{id do carro}
-            exemplo: fog/1/better_station/1
-        """
-        topic_sub = f"{self.fog_prefix}/{self.fog_id}/{topics.BETTER_STATION}/{self.id_carro}"
-        self.client.subscribe(topic_sub)
-        self.boolean_enviando_bateria = True
         """
             Vai fazer a publicação no tópico com o seguinte formato:
             fog/{id da névoa}/low_battery
@@ -171,18 +160,71 @@ class Car:
         topico_pub = f"{self.fog_prefix}/{self.fog_id}/{topics.LOW_BATTERY}"
         payload = json.dumps(payload)
         self.client.publish(topico_pub, payload)
-        while self.boolean_enviando_bateria:
-            time.sleep(3.0)
-            print(f"Esperando resposta de melhor posto no tópico {topic_sub}...")
-            self.client.publish(topico_pub, payload)
+
+        # Inicia o temporizador
+        #self.timer1 = threading.Timer(30, on_timeout)
+        #self.timer1.start()
+
+        # Tempo até o servidor responder, senão o carro envia outro aviso
+        # time.sleep(60)
+        # Se o carro não estiver tentando ocupar um posto depois de alguns segundos, vai enviar outro aviso de bateria baixa
+        # if not self.tentando_ocupar_posto:
+        #    self.boolean_enviando_bateria = False
+
+    def ocupar_vaga_posto(self, melhor_posto):
+        self.tentando_ocupar_posto = True
+        # Faz o carro ocupar vaga do posto
+        id_posto = str(melhor_posto["id_posto"])
+        topico_ocupar_vaga = f"{self.fog_prefix}/{self.fog_id}/incrise_line/{id_posto}"
+        # topico_ocupar_vaga = f"{self.fog_prefix}/{self.fog_id}/incrise_line/0"
+        payload = {
+            "id_carro": self.id_carro
+        }
+        payload = json.dumps(payload)
+        self.client.publish(topico_ocupar_vaga, payload)
+        print(f"Mensagem de ocupar vaga publicada em {topico_ocupar_vaga}")
+
+        # Tempo limite de resposta
+        # time.sleep(5)
+        # if self.tentando_ocupar_posto:
+        #    print(f"Tempo de espera de resposta atingiu o limite, sem resposta do posto {id_posto}")
+        #    self.encontrar_outro_posto(id_posto)
+        # else:
+        #    print("else")
+
+    def encontrar_outro_posto(self, id_posto):
+        print(f"Tentando encontrar outro posto...")
+        payload = {
+            "id_carro": self.id_carro,
+            "id_posto": id_posto,
+            "latitude": self.latitude,
+            "longitude": self.longitude,
+            "max_distance_per_charge": self.max_distance_per_charge
+        }
+        # self.boolean_enviando_bateria = True
+        """
+            Vai fazer a publicação no tópico com o seguinte formato:
+            fog/{id da névoa}/alt_station
+        """
+        topico_pub = f"{self.fog_prefix}/{self.fog_id}/{topics.ALT_STATION}"
+        payload = json.dumps(payload)
+        self.client.publish(topico_pub, payload)
+
+        # Tempo máximo de espera de resposta do posto
+        time.sleep(10)
+        # Se o carro não estiver recarregando o carro depois de alguns segundos, o carro vai pedir de novo o posto principal
+        if not self.recarregando_carro:
+            print("Tentativa de achar outro posto falhou...")
+            self.boolean_enviando_bateria = False
+            self.tentando_ocupar_posto = False
 
     # Diminui a bateria quando o carro anda
     def diminui_bateria(self, distancia):
         # self.bateria -= round(distancia / self.max_distance_per_charge * 100, 2)
         self.bateria -= 1
-        clear_screen()
+        # clear_screen()
         print(f"Carro se moveu! Bateria = {self.bateria}%")
-        print(f"Posição atual: ({self.latitude}), ({self.longitude})")
+        # print(f"Posição atual: ({self.latitude}), ({self.longitude})")
 
     def parar(self):
         self.client.loop_stop()
@@ -203,7 +245,6 @@ class Car:
         self.diminui_bateria(distancia)
 
     def run(self):
-
         try:
             while self.bateria > 0:
                 # Simula o carro andando aleatoriamente as coordenadas
@@ -214,18 +255,20 @@ class Car:
                     tem um processamento de envio de bateria baixa
                 """
                 if self.bateria < 15 and not self.boolean_enviando_bateria:
-                    thread = threading.Thread(target=self.enviar_bateria_baixa)
+                    self.boolean_enviando_bateria = True
+                    print("Carro enviando bateria baixa...")
+                    thread = threading.Thread(target=self.encontrar_posto_principal)
                     thread.start()
                     self.recarregando_carro = True
                     while self.recarregando_carro:
                         time.sleep(0.5)
 
-                time.sleep(2)
+                time.sleep(3)
         except KeyboardInterrupt:
             self.parar()
 
 
 if __name__ == '__main__':
-    carro = Car(1, 15, 200)
+    carro = Car(1, 16, 200)
     time.sleep(1)
     carro.run()
