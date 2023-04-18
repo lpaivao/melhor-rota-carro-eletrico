@@ -78,4 +78,4 @@ if __name__ == '__main__':
     HOST = '127.0.0.1'
     PORT = 65136
     my_cloud = Cloud(HOST, PORT)
-    print(f"The cloud is listening on: ({HOST}:{PORT})")
+    print(f"The cloud node is listening on: ({HOST}:{PORT})")
