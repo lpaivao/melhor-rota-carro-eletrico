@@ -1,6 +1,3 @@
-import datetime
-import socket
-
 import paho.mqtt.client as mqtt
 import json
 import random
@@ -18,7 +15,8 @@ def clear_screen():
 
 os.environ['TERM'] = 'xterm'
 
-posto = {'id_posto': 0, 'latitude': -23.5440, 'longitude': -46.6340, 'fila': 0, 'vaga': True}
+posto = {'id_posto': 0, 'latitude': -23.5440,
+         'longitude': -46.6340, 'fila': 0, 'vaga': True}
 
 
 # Função que será executada se o tempo limite for atingido
@@ -75,7 +73,8 @@ class Car:
             fog/{id da névoa}/better_station/{id do carro}
             exemplo: fog/1/better_station/1
         """
-        self.client.subscribe(f"{self.fog_prefix}/{self.fog_id}/{topics.BETTER_STATION}/{self.id_carro}")
+        self.client.subscribe(
+            f"{self.fog_prefix}/{self.fog_id}/{topics.BETTER_STATION}/{self.id_carro}")
 
         # Teste
         # topico_ocupar_vaga = f"{self.fog_prefix}/{self.fog_id}/incrise_line/0"
@@ -91,7 +90,8 @@ class Car:
         if message.topic == f"{self.fog_prefix}/{self.fog_id}/{topics.BETTER_STATION}/{self.id_carro}":
             # self.boolean_enviando_bateria = False
             self.melhor_posto = payload
-            print(f"Posto encontrado! Tentativa de ocupar vaga do posto [{self.melhor_posto['id_posto']}]...")
+            print(
+                f"Posto encontrado! Tentativa de ocupar vaga do posto [{self.melhor_posto['id_posto']}]...")
 
             self.ocupar_vaga_posto(self.melhor_posto)
 
@@ -107,7 +107,8 @@ class Car:
             self.longitude = payload["longitude"]
 
             for i in range(10, 0, -1):
-                print(f"Aguarde {i} segundos, recarregando o carro no Posto {self.melhor_posto['id_posto']}...")
+                print(
+                    f"Aguarde {i} segundos, recarregando o carro no Posto {self.melhor_posto['id_posto']}...")
                 time.sleep(1)
                 # clear_screen()
 
@@ -118,14 +119,16 @@ class Car:
         elif message.topic == f"cloud/{topics.FOG_CHANGE}/{self.fog_id}":
             # Desinscreve do tópico da névoa antiga de melhor posto
             try:
-                self.client.unsubscribe(f"{self.fog_prefix}/{self.fog_id}/{topics.BETTER_STATION}/{self.id_carro}")
+                self.client.unsubscribe(
+                    f"{self.fog_prefix}/{self.fog_id}/{topics.BETTER_STATION}/{self.id_carro}")
             except:
                 pass
             # Atualiza o id da névoa
             old_fog_id = self.fog_id
             new_fog_id = payload["fog_id"]
             self.fog_id = new_fog_id
-            print(f"Névoa atualizada!\nNévoa antiga:[{old_fog_id}] | Névoa atual:[{self.fog_id}]")
+            print(
+                f"Névoa atualizada!\nNévoa antiga:[{old_fog_id}] | Névoa atual:[{self.fog_id}]")
             time.sleep(3)
             print("Carro vai voltar a andar...")
             self.recarregando_carro = False
@@ -162,8 +165,8 @@ class Car:
         self.client.publish(topico_pub, payload)
 
         # Inicia o temporizador
-        #self.timer1 = threading.Timer(30, on_timeout)
-        #self.timer1.start()
+        # self.timer1 = threading.Timer(30, on_timeout)
+        # self.timer1.start()
 
         # Tempo até o servidor responder, senão o carro envia outro aviso
         # time.sleep(60)
@@ -248,7 +251,8 @@ class Car:
         try:
             while self.bateria > 0:
                 # Simula o carro andando aleatoriamente as coordenadas
-                lat, lon = random.uniform(-0.0005, 0.0005), random.uniform(-0.0005, 0.0005)
+                lat, lon = random.uniform(-0.0005,
+                                          0.0005), random.uniform(-0.0005, 0.0005)
                 self.mover(lat, lon)
                 """
                     Verifica se a bateria está baixa e se já não 
@@ -257,7 +261,8 @@ class Car:
                 if self.bateria < 15 and not self.boolean_enviando_bateria:
                     self.boolean_enviando_bateria = True
                     print("Carro enviando bateria baixa...")
-                    thread = threading.Thread(target=self.encontrar_posto_principal)
+                    thread = threading.Thread(
+                        target=self.encontrar_posto_principal)
                     thread.start()
                     self.recarregando_carro = True
                     while self.recarregando_carro:

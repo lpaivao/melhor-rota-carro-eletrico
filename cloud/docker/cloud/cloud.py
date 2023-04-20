@@ -1,3 +1,13 @@
+"""
+This class is responsable for creating objects that are capable of making and managing multiple TCP/IP connections 
+
+Classe responsável por criar objetos capazes de criar e gerenciar múltiplas conexões com servidores remotos e que 
+
+
+
+
+
+"""
 from flask import Flask, request, jsonify
 import socket
 import threading
@@ -75,7 +85,7 @@ class Cloud:
 
 
 if __name__ == '__main__':
-    HOST = '127.0.0.1'
-    PORT = 65136
+    HOST = 'localhost'
+    PORT = 8000
     my_cloud = Cloud(HOST, PORT)
     print(f"The cloud node is listening on: ({HOST}:{PORT})")

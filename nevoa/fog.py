@@ -159,10 +159,14 @@ class Fog:
         print("Inscrito em todos os postos")
 
     def _connect_to_cloud(self):
-        current_time = datetime.datetime.now()
-        print(f"[{current_time}] - Connected to cloud no endereço ({self.http_host}:{self.http_port})")
-        self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.server.connect((self.http_host, self.http_port))
+        try:
+            self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.server.connect((self.http_host, self.http_port))
+            current_time = datetime.datetime.now()
+            print(
+                f"[{current_time}] - Connected to cloud no endereço ({self.http_host}:{self.http_port})")
+        except Exception as e:
+            print(e)
 
     def send_car_request_change_fog(self, request):
         self.server.sendall(request.encode())
