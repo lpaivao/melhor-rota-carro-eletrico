@@ -20,9 +20,9 @@ def hello():
 
 
 nevoas_var = {
-    "0": {"fog_id": 0, "ponto_central": Point(-23.5450, -46.6350)},
-    "1": {"fog_id": 1, "ponto_central": Point(-23.5600, -46.6600)},
-    "2": {"fog_id": 2, "ponto_central": Point(-23.5480, -46.6380)}
+    "0": {"fog_id": 0, "ponto_central": Point(-23.5450, -46.6350), "conectado": False},
+    "1": {"fog_id": 1, "ponto_central": Point(-23.5600, -46.6600), "conectado": False},
+    "2": {"fog_id": 2, "ponto_central": Point(-23.5480, -46.6380), "conectado": False}
 }
 
 
@@ -55,6 +55,8 @@ class Cloud:
         self.client.loop_forever()
     def on_connect(self, client, userdata, flags, rc):
         print(f'Conectado ao Broker! Código de retorno {rc}')
+        topic_sub = f"cloud/fog_connect"
+        self.client.subscribe(topic_sub)
 
     def _handle_conn(self, socket):
         while True:
@@ -80,28 +82,32 @@ class Cloud:
                     # Decodifica a mensagem
                     message = data.decode("utf-8")
                     message = json.loads(message)
-                    # Desmembra as informações
-                    id_carro = message["id_carro"]
-                    latitude = message["latitude"]
-                    longitude = message["longitude"]
-                    max_distance_per_charge = message["max_distance_per_charge"]
                     fog_id = message["fog_id"]
 
-                    # Verifica a névoa nova
-                    nova_nevoa_id = functions.calcula_nevoa_proxima(fog_id, latitude, longitude,
-                                                                    max_distance_per_charge, self.nevoas)
+                    if "conectado" in message:
+                        self.nevoas[fog_id]["conectado"] = message["conectado"]
+                    else:
+                        # Desmembra as informações
+                        id_carro = message["id_carro"]
+                        latitude = message["latitude"]
+                        longitude = message["longitude"]
+                        max_distance_per_charge = message["max_distance_per_charge"]
 
-                    # Constrói a resposta
-                    response = {
-                        "fog_id": nova_nevoa_id
-                    }
-                    response = json.dumps(response)
+                        # Verifica a névoa nova
+                        nova_nevoa_id = functions.calcula_nevoa_proxima(fog_id, latitude, longitude,
+                                                                        max_distance_per_charge, self.nevoas)
 
-                    # Tópico para enviar a mensagem
-                    topic_pub = f"cloud/fog_change/{id_carro}"
-                    # Envia mensagem
-                    print(f"Mudando carro {id_carro} da nevoa {fog_id} para a nevoa {nova_nevoa_id}")
-                    self.client.publish(topic_pub, response)
+                        # Constrói a resposta
+                        response = {
+                            "fog_id": nova_nevoa_id
+                        }
+                        response = json.dumps(response)
+
+                        # Tópico para enviar a mensagem
+                        topic_pub = f"cloud/fog_change/{id_carro}"
+                        # Envia mensagem
+                        print(f"Mudando carro {id_carro} da nevoa {fog_id} para a nevoa {nova_nevoa_id}")
+                        self.client.publish(topic_pub, response)
 
                 except socket.error:
                     print("Client disconnected")

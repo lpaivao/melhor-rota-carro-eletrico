@@ -11,16 +11,16 @@ import datetime
 # fila = quantos carros tem na fila
 # espera = tempo de espera
 postos_disponiveis = {
-    '0': {'id_posto': 0, 'latitude': -23.5440, 'longitude': -46.6340, 'fila': 0, 'vaga': True},
-    '1': {'id_posto': 1, 'latitude': -23.5450, 'longitude': -46.6350, 'fila': 2, 'vaga': True},
-    '2': {'id_posto': 2, 'latitude': -23.5560, 'longitude': -46.6360, 'fila': 3, 'vaga': True}
+    '0': {'id_posto': 0, 'latitude': -23.5440, 'longitude': -46.6340, 'fila': 0, 'vaga': True, 'conectado': False},
+    '1': {'id_posto': 1, 'latitude': -23.5450, 'longitude': -46.6350, 'fila': 2, 'vaga': True, 'conectado': False},
+    '2': {'id_posto': 2, 'latitude': -23.5560, 'longitude': -46.6360, 'fila': 3, 'vaga': True, 'conectado': False}
 }
 
 
 class Fog:
     def __init__(self, fog_prefix, fog_id: int, postos=postos_disponiveis, host='localhost', http_port=8000, http_host='localhost'):
         # Prefixo de qual nuvem o carro está no momento
-        self.fog_prefix = fog_prefix
+        self.fog_prefix = "fog"
         # ID na nevoa
         self.fog_id = fog_id
         # Dicionário de postos da névoa
@@ -73,12 +73,14 @@ class Fog:
                 if topic[2] == "vaga_status":
                     id_posto = str(msg["id_posto"])
                     fila = msg["fila"]
+                    conectado = msg["conectado"]
                     self.postos[id_posto]["fila"] = fila
+                    self.postos[id_posto]["conectado"] = conectado
+                    print(f"Posto {id_posto} conectado")
 
                 elif topic[2] == "alocando_carro":
                     id_posto = str(msg["id_posto"])
                     vaga = msg["vaga"]
-                    self.postos[id_posto]["vaga"] = vaga
                     self.postos[id_posto]["vaga"] = vaga
 
                 elif topic[2] == topics.LOW_BATTERY:
@@ -92,17 +94,25 @@ class Fog:
                                                                          longitude,
                                                                          max_distance_per_charge)
 
-                    # Transforma em objeto json
-                    payload = json.dumps(posto_mais_proximo)
-                    """
-                        Quando a névoa fizer publish para o carro com bateria baixa,
-                        ele vai responder no topico que contém o identificador da névoa
-                        e o id do carro:
-                        fog/{id da névoa}/better_station/{id do carro}
-                        exemplo: fog/1/better_station/1
-                    """
-                    topico_pub = f"{self.fog_prefix}/{self.fog_id}/{topics.BETTER_STATION}/{id_carro}"
-                    client.publish(topico_pub, payload)
+                    if posto_mais_proximo is None:
+                        payload = {
+                            "id_posto": -1
+                        }
+                        payload = json.dumps(payload)
+                        topico_pub = f"{self.fog_prefix}/{self.fog_id}/{topics.BETTER_STATION}/{id_carro}"
+                        client.publish(topico_pub, payload)
+                    else:
+                        # Transforma em objeto json
+                        payload = json.dumps(posto_mais_proximo)
+                        """
+                            Quando a névoa fizer publish para o carro com bateria baixa,
+                            ele vai responder no topico que contém o identificador da névoa
+                            e o id do carro:
+                            fog/{id da névoa}/better_station/{id do carro}
+                            exemplo: fog/1/better_station/1
+                        """
+                        topico_pub = f"{self.fog_prefix}/{self.fog_id}/{topics.BETTER_STATION}/{id_carro}"
+                        client.publish(topico_pub, payload)
 
                 elif topic[2] == topics.ALT_STATION:
                     id_carro = msg["id_carro"]
@@ -152,7 +162,6 @@ class Fog:
         for posto in self.postos:
             self.client.subscribe(
                 f'{self.fog_prefix}/{self.fog_id}/vaga_status/{self.postos[posto]["id_posto"]}')
-            # self.client.subscribe(f'{self.fog_prefix}/{self.fog_id}/incrise_line/{self.postos[posto]["id_posto"]}')
             self.client.subscribe(
                 f'{self.fog_prefix}/{self.fog_id}/alocando_carro/{self.postos[posto]["id_posto"]}')
 
@@ -191,6 +200,20 @@ class Fog:
 
     def __del__(self):
         self.connection_thread.join()
+
+    def desconectar_nevoa(self):
+        while True:
+            try:
+                pass
+            except KeyboardInterrupt:
+                payload = {
+                    "fog_id": self.fog_id,
+                    "conectado": False
+                }
+
+                payload = json.dumps(payload)
+
+                self.server.sendall(payload.encode())
 
 
 if __name__ == '__main__':

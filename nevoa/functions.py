@@ -46,10 +46,11 @@ def calcular_posto_mais_proximo_menor_fila(postos, latitude, longitude, max_dist
             distancia = geodesic((latitude, longitude),
                                  (postos[posto]["latitude"], postos[posto]["longitude"])).km
 
-            if posto_mais_proximo is None and postos[posto]["vaga"] == True:
-                nome_mais_proximo = posto
-                posto_mais_proximo = postos[posto]
-                distancia_mais_proximo = distancia
+            if posto_mais_proximo is None:
+                if postos[posto]["vaga"] is True and postos[posto]["conectado"] is True:
+                    nome_mais_proximo = posto
+                    posto_mais_proximo = postos[posto]
+                    distancia_mais_proximo = distancia
             else:
                 # Se a distância for menor que a distância que o carro percorre com a bateria toda carregada
                 # e o tempo de espera for o menor, atualiza o posto mais próximo
@@ -59,6 +60,7 @@ def calcular_posto_mais_proximo_menor_fila(postos, latitude, longitude, max_dist
                         posto_mais_proximo = postos[posto]
                         distancia_mais_proximo = distancia
 
+    print(posto_mais_proximo)
     return nome_mais_proximo, posto_mais_proximo, distancia_mais_proximo
 
 
