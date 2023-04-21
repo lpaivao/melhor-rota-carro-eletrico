@@ -162,7 +162,6 @@ class Fog:
         for posto in self.postos:
             self.client.subscribe(
                 f'{self.fog_prefix}/{self.fog_id}/vaga_status/{self.postos[posto]["id_posto"]}')
-            # self.client.subscribe(f'{self.fog_prefix}/{self.fog_id}/incrise_line/{self.postos[posto]["id_posto"]}')
             self.client.subscribe(
                 f'{self.fog_prefix}/{self.fog_id}/alocando_carro/{self.postos[posto]["id_posto"]}')
 
@@ -201,6 +200,20 @@ class Fog:
 
     def __del__(self):
         self.connection_thread.join()
+
+    def desconectar_nevoa(self):
+        while True:
+            try:
+                pass
+            except KeyboardInterrupt:
+                payload = {
+                    "fog_id": self.fog_id,
+                    "conectado": False
+                }
+
+                payload = json.dumps(payload)
+
+                self.server.sendall(payload.encode())
 
 
 if __name__ == '__main__':
