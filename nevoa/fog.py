@@ -18,7 +18,7 @@ postos_disponiveis = {
 
 
 class Fog:
-    def __init__(self, fog_prefix="fog", fog_id=1, postos=postos_disponiveis, host='localhost', http_port=8000, http_host='localhost'):
+    def __init__(self, fog_prefix, fog_id: int, postos=postos_disponiveis, host='localhost', http_port=8000, http_host='localhost'):
         # Prefixo de qual nuvem o carro está no momento
         self.fog_prefix = fog_prefix
         # ID na nevoa
@@ -32,7 +32,7 @@ class Fog:
         self.http_port = http_port
         self.server = None
 
-        self.client = mqtt.Client()
+        self.client = mqtt.Client(client_id=f"Nevoa {fog_id}")
         self.client.on_connect = self.on_connect
         self.client.on_message = self.on_message
         self.client.connect(host, 1883, 60)
@@ -164,9 +164,9 @@ class Fog:
             self.server.connect((self.http_host, self.http_port))
             current_time = datetime.datetime.now()
             print(
-                f"[{current_time}] - Connected to cloud no endereço ({self.http_host}:{self.http_port})")
-        except Exception as e:
-            print(e)
+                f"[{current_time}] - Connected to cloud on address ({self.http_host}:{self.http_port})")
+        except ConnectionRefusedError:
+            print("\n\nThere was an error in making the connection with the cloud!\n")
 
     def send_car_request_change_fog(self, request):
         self.server.sendall(request.encode())
@@ -194,4 +194,4 @@ class Fog:
 
 
 if __name__ == '__main__':
-    fog = Fog()
+    fog = Fog("fog", 1)

@@ -50,7 +50,7 @@ class Car:
         self.bateria = bateria
 
         # Configura cliente mqtt
-        self.client = mqtt.Client()
+        self.client = mqtt.Client(client_id=f"Carro {id_carro}")
         self.client.on_connect = self.on_connect
         self.client.on_message = self.on_message
         self.client.connect("localhost", 1883, 60)
