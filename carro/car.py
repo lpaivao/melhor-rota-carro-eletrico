@@ -33,10 +33,8 @@ class Car:
         self.fog_id = fog_id
         # Dicionário com as informações do melhor posto desde a última solicitação
         self.melhor_posto = melhor_posto
-        # Variável booleana para indicar se tem um processo de envio de bateria baixa acontecendo
-        self.boolean_enviando_bateria = False
-        self.tentando_ocupar_posto = False
-        self.recarregando_carro = False
+
+        self.carro_pode_andar = False
         self.posto_respondeu = False
         self.timer1 = None
         self.timer2 = None
@@ -77,7 +75,7 @@ class Car:
             f"{self.fog_prefix}/{self.fog_id}/{topics.BETTER_STATION}/{self.id_carro}")
 
         # Teste
-        # topico_ocupar_vaga = f"{self.fog_prefix}/{self.fog_id}/incrise_line/0"
+        # topico_ocupar_vaga = f"{self.fog_prefix}/{self.fog_id}/increase_line/0"
         # message = {"id_carro": 1}
         # self.client.publish(topico_ocupar_vaga, json.dumps(message))
 
@@ -88,18 +86,18 @@ class Car:
 
         # Tópico de melhor posto
         if message.topic == f"{self.fog_prefix}/{self.fog_id}/{topics.BETTER_STATION}/{self.id_carro}":
-            # self.boolean_enviando_bateria = False
-            self.melhor_posto = payload
-            print(
-                f"Posto encontrado! Tentativa de ocupar vaga do posto [{self.melhor_posto['id_posto']}]...")
+            if payload["id_posto"] == -1:
+                print("Nenhum posto disponível na névoa, tentando em outra...")
+                self.mudar_nevoa()
+            else:
+                self.melhor_posto = payload
+                print(
+                    f"Posto encontrado! Tentativa de ocupar vaga do posto [{self.melhor_posto['id_posto']}]...")
 
-            self.ocupar_vaga_posto(self.melhor_posto)
+                self.ocupar_vaga_posto(self.melhor_posto)
 
         # Tópico de recarregar bateria
         elif message.topic == f"{topics.BATTERY_RECHARGED}/{self.id_carro}":
-            self.recarregando_carro = True
-            self.tentando_ocupar_posto = False
-            self.boolean_enviando_bateria = False
             contador = 30 - self.bateria
             # self.bateria = int(payload["bateria"])
             self.bateria = 20
@@ -113,7 +111,7 @@ class Car:
                 # clear_screen()
 
             print("Carro recarregado! Bateria em 100%")
-            self.mudar_nevoa()
+            self.carro_pode_andar = True
 
         # Tópico de mudança de névoa
         elif message.topic == f"cloud/{topics.FOG_CHANGE}/{self.fog_id}":
@@ -127,11 +125,11 @@ class Car:
             old_fog_id = self.fog_id
             new_fog_id = payload["fog_id"]
             self.fog_id = new_fog_id
+            self.client.subscribe(f"{self.fog_prefix}/{self.fog_id}/{topics.BETTER_STATION}/{self.id_carro}")
             print(
                 f"Névoa atualizada!\nNévoa antiga:[{old_fog_id}] | Névoa atual:[{self.fog_id}]")
             time.sleep(3)
-            print("Carro vai voltar a andar...")
-            self.recarregando_carro = False
+            self.carro_pode_andar = True
 
     def mudar_nevoa(self):
         print("Carro vai mudar de névoa...")
@@ -148,8 +146,8 @@ class Car:
 
         self.client.publish(topic_pub, payload)
 
-    def encontrar_posto_principal(self):
-
+    def envia_bateria_baixa(self):
+        print("Carro enviando bateria baixa...")
         payload = {
             "id_carro": self.id_carro,
             "latitude": self.latitude,
@@ -172,14 +170,13 @@ class Car:
         # time.sleep(60)
         # Se o carro não estiver tentando ocupar um posto depois de alguns segundos, vai enviar outro aviso de bateria baixa
         # if not self.tentando_ocupar_posto:
-        #    self.boolean_enviando_bateria = False
 
     def ocupar_vaga_posto(self, melhor_posto):
         self.tentando_ocupar_posto = True
         # Faz o carro ocupar vaga do posto
         id_posto = str(melhor_posto["id_posto"])
-        topico_ocupar_vaga = f"{self.fog_prefix}/{self.fog_id}/incrise_line/{id_posto}"
-        # topico_ocupar_vaga = f"{self.fog_prefix}/{self.fog_id}/incrise_line/0"
+        topico_ocupar_vaga = f"{self.fog_prefix}/{self.fog_id}/increase_line/{id_posto}"
+        # topico_ocupar_vaga = f"{self.fog_prefix}/{self.fog_id}/increase_line/0"
         payload = {
             "id_carro": self.id_carro
         }
@@ -204,7 +201,6 @@ class Car:
             "longitude": self.longitude,
             "max_distance_per_charge": self.max_distance_per_charge
         }
-        # self.boolean_enviando_bateria = True
         """
             Vai fazer a publicação no tópico com o seguinte formato:
             fog/{id da névoa}/alt_station
@@ -216,10 +212,8 @@ class Car:
         # Tempo máximo de espera de resposta do posto
         time.sleep(10)
         # Se o carro não estiver recarregando o carro depois de alguns segundos, o carro vai pedir de novo o posto principal
-        if not self.recarregando_carro:
+        if not self.carro_pode_andar:
             print("Tentativa de achar outro posto falhou...")
-            self.boolean_enviando_bateria = False
-            self.tentando_ocupar_posto = False
 
     # Diminui a bateria quando o carro anda
     def diminui_bateria(self, distancia):
@@ -258,15 +252,14 @@ class Car:
                     Verifica se a bateria está baixa e se já não 
                     tem um processamento de envio de bateria baixa
                 """
-                if self.bateria < 15 and not self.boolean_enviando_bateria:
-                    self.boolean_enviando_bateria = True
-                    print("Carro enviando bateria baixa...")
+                if self.bateria < 15:
+                    #self.envia_bateria_baixa()
                     thread = threading.Thread(
-                        target=self.encontrar_posto_principal)
+                        target=self.envia_bateria_baixa)
                     thread.start()
-                    self.recarregando_carro = True
-                    while self.recarregando_carro:
-                        time.sleep(0.5)
+                    self.carro_pode_andar = False
+                    while not self.carro_pode_andar:
+                        time.sleep(1)
 
                 time.sleep(3)
         except KeyboardInterrupt:
