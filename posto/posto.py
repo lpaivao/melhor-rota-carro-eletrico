@@ -45,7 +45,8 @@ class Posto:
         self.client.subscribe(self.__INCREASE_LINE)
         self.client.publish(self.__STATUS, json.dumps({
             "id_posto": self.ID_POSTO,
-            "fila": self.fila
+            "fila": self.fila,
+            "conectado": True
         }))
 
     def on_message(self, client, data, message):
@@ -83,9 +84,9 @@ class Posto:
         print("Estou publicando status")
         self.client.publish(self.__STATUS, json.dumps({
             "id_posto": self.ID_POSTO,
-            "fila": self.fila
+            "fila": self.fila,
+            "conectado": True
         }))
-        self.client.publish("a",)
 
     def recarregar_bateria(self, id_carro):
         print(f"Bateria do carro {id_carro} recarregada")
@@ -105,6 +106,23 @@ class Posto:
             self.fila -= 1
             print(f"subtraindo fila:{self.fila}")
 
+    def desconectar_posto(self):
+        while True:
+            try:
+                pass
+            except KeyboardInterrupt:
+                self.client.publish(self.__STATUS, json.dumps({
+                    "id_posto": self.ID_POSTO,
+                    "fila": self.fila,
+                    "conectado": False
+                }))
+
 
 if __name__ == '__main__':
-    posto = Posto(ID_POSTO=2)
+    posto = Posto(ID_POSTO=1)
+
+    posto.posto_disconnect()
+
+
+
+
