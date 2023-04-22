@@ -176,7 +176,7 @@ class Fog:
             print(
                 f"[{current_time}]: Connected to cloud on address ({self.http_host}:{self.http_port})")
         except ConnectionRefusedError:
-            print("\n\nThere was an error in making the connection with the cloud!\n")
+            print("There was an error in making the connection with the cloud!")
 
     def send_car_request_change_fog(self, request):
         self.server.sendall(request.encode())

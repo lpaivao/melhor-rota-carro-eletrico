@@ -32,11 +32,9 @@ class Cloud:
         # Conexão MQTT
         self.client = mqtt.Client(client_id=f"Cloud {self.id}")
         self.client.on_connect = self.on_connect
-        
-        
-        self.client.connect('127.0.0.1', 1883, 60)
 
-            
+        self.client.connect('localhost', 1883, 60)
+
         # Conexão sock
         self.host = host
         self.port = port
