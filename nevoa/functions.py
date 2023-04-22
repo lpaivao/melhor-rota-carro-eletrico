@@ -1,6 +1,7 @@
 from geopy.distance import geodesic
 from geopy import Point, distance
 import numpy as np
+import datetime
 
 
 def calcular_posto_mais_proximo_mais_rapido(postos, latitude, longitude, max_distance_per_charge):
@@ -105,10 +106,18 @@ def calcular_ponto_central(postos):
             # Criação do objeto Point para a localização central
             central_location = Point(latitude, longitude)
         else:
-            mean_latitude = np.mean([postos[posto]["latitude"] for posto in postos])
-            mean_longitude = np.mean([postos[posto]["longitude"] for posto in postos])
+            mean_latitude = np.mean([postos[posto]["latitude"]
+                                    for posto in postos])
+            mean_longitude = np.mean(
+                [postos[posto]["longitude"] for posto in postos])
             central_location = Point(mean_latitude, mean_longitude)
     else:
         return None
 
     return central_location
+
+
+def format_time():
+    t = datetime.datetime.now()
+    s = t.strftime('%d-%m-%Y %H:%M:%S%f')
+    return s[:-6]

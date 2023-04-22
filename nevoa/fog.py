@@ -64,8 +64,9 @@ class Fog:
         msg = message.payload.decode()
         msg = json.loads(msg)
         print(message.topic)
-        # print(f"mensagem recebida:{msg}")
+        print(f"mensagem recebida:{msg}")
 
+        # Garante que a mensagem a ser tratada é realmente uma mensagem para a névoa
         if topic[0] == str(self.fog_prefix):
 
             if topic[1] == str(self.fog_id):
@@ -171,9 +172,9 @@ class Fog:
         try:
             self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.server.connect((self.http_host, self.http_port))
-            current_time = datetime.datetime.now()
+            current_time = functions.format_time()
             print(
-                f"[{current_time}] - Connected to cloud on address ({self.http_host}:{self.http_port})")
+                f"[{current_time}]: Connected to cloud on address ({self.http_host}:{self.http_port})")
         except ConnectionRefusedError:
             print("\n\nThere was an error in making the connection with the cloud!\n")
 

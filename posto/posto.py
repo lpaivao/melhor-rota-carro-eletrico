@@ -1,9 +1,9 @@
-import random
 import paho.mqtt.client as client
 import json
 import schedule
 import threading
 import time
+import functions
 
 
 class Posto:
@@ -81,7 +81,8 @@ class Posto:
                 }))
 
     def publish_status(self):
-        print("Estou publicando status")
+        current_time = functions.format_time()
+        print(f"[{current_time}]: Estou publicando status")
         self.client.publish(self.__STATUS, json.dumps({
             "id_posto": self.ID_POSTO,
             "fila": self.fila,
@@ -122,7 +123,3 @@ if __name__ == '__main__':
     posto = Posto(ID_POSTO=1)
 
     posto.posto_disconnect()
-
-
-
-

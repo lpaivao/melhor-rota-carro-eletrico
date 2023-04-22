@@ -267,6 +267,6 @@ class Car:
 
 
 if __name__ == '__main__':
-    carro = Car(1, 16, 200)
+    carro = Car(2, 16, 200)
     time.sleep(1)
     carro.run()
