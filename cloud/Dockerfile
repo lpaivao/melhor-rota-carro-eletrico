@@ -4,7 +4,7 @@ FROM python:3.11-slim-buster
 COPY . /cloud/
 
 # Esse commando é como o comando 'cd' no terminal
-WORKDIR /cloud
+WORKDIR /cloud/
 
 ENV VIRTUAL_ENV=/opt/venv
 RUN python3 -m venv ${VIRTUAL_ENV}
