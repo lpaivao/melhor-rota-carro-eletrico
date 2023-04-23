@@ -33,7 +33,11 @@ class Cloud:
         self.client = mqtt.Client(client_id=f"Cloud {self.id}")
         self.client.on_connect = self.on_connect
 
-        self.client.connect('localhost', 1883, 60)
+        try:
+            self.client.connect('127.0.0.1', 1883, 60)
+        except ConnectionRefusedError as e:
+            print(e)
+            print("Não foi possível conectar ao Broker MQTT")
 
         # Conexão sock
         self.host = host

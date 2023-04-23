@@ -3,6 +3,9 @@
 ## create docker network
 docker network create rede-pbl2
 
+## to inpect the network (retorna em formato json)
+docker inspect rede-pbl2
+
 ## start mosquitto
 docker run -t -d \
 -p 1883:1883 \
@@ -20,10 +23,15 @@ vi mosquitto.conf
 # Tecle algo para iniciar o modo de escrita e escreva essas duas linhas abaixo em qualquer lugar dentro do arquivo:
 listener 1883
 allow_anonymous true
+log_type all
+log_timestamp true
 
 # Dê um ESC para sair do modo de escrita
 # Use o comando abaixo para salvar as mudanças e sair do VIM
 :wq!
+
+## build cloud image
+docker build -t pbl2-cloud:1.0 cloud
 
 ## start cloud
 docker run -d \
