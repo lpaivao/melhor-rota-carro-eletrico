@@ -1,20 +1,12 @@
 import json
 
-from flask import Flask, jsonify
 import socket
 import threading
 from geopy import Point
 import paho.mqtt.client as mqtt
 import functions
 
-app = Flask(__name__)
 
-
-@app.route("/", methods=['GET'])
-def hello():
-    return jsonify({"message": "Hello, World!",
-                    "error": False
-                    })
 
 
 nevoas_var = {
@@ -25,7 +17,7 @@ nevoas_var = {
 
 
 class Cloud:
-    def __init__(self, id, host, port, nevoas=nevoas_var):
+    def __init__(self, id, host="localhost", port=8000, nevoas=nevoas_var):
         self.id = id
         self.nevoas = nevoas
 
@@ -33,11 +25,13 @@ class Cloud:
         self.client = mqtt.Client(client_id=f"Cloud {self.id}")
         self.client.on_connect = self.on_connect
 
-        try:
-            self.client.connect('127.0.0.1', 1883, 60)
-        except ConnectionRefusedError as e:
-            print(e)
-            print("Não foi possível conectar ao Broker MQTT")
+        while True:
+            try:
+                self.client.connect('localhost', 1883, 60)
+                break
+            except ConnectionRefusedError as e:
+                print(e)
+                print("Não foi possível conectar ao Broker MQTT")
 
         # Conexão sock
         self.host = host
@@ -127,7 +121,9 @@ class Cloud:
         pass
 
 
+
 if __name__ == '__main__':
+    print("Ola sou um container!")
     HOST = '127.0.0.1'
     PORT = 8000
     print(f"The cloud is listening on: ({HOST}:{PORT})")
