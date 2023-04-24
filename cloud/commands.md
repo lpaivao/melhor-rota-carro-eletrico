@@ -1,16 +1,14 @@
 # commands
 
 ## create docker network
-docker network create rede-pbl2
+docker network create pbl2-network
 
-## to inpect the network (retorna em formato json)
-docker inspect rede-pbl2
+## to see the configs of the network (retorna em formato json)
+docker inspect pbl2-network
 
 ## start mosquitto
 docker run -t -d \
--p 1883:1883 \
--p 9001:9001 \
---net rede-pbl2 \
+--net pbl2-network \
 --name mosquitto \
 eclipse-mosquitto
 
@@ -35,7 +33,16 @@ docker build -t pbl2-cloud:1.0 cloud
 
 ## start cloud
 docker run -d \
--p 8000:8000 \
---net rede-pbl2 \
+--net pbl2-network \
 --name cloud \
 pbl2-cloud:1.0
+
+docker run -it my-app python app.py --ip 192.168.1.100 --port 8080
+
+
+## docker network commands
+# lists networks
+docker network ls
+
+# list all nat rules
+sudo iptables -t nat -L
