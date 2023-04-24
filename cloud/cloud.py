@@ -123,7 +123,7 @@ class Cloud:
 
 if __name__ == '__main__':
     print("Ola sou um container!")
-    HOST = '127.0.0.1'
+    HOST = host=socket.gethostbyname(socket.gethostname())
     PORT = 8000
     print(f"The cloud is listening on: ({HOST}:{PORT})")
     my_cloud = Cloud(1, HOST, PORT)
