@@ -1,4 +1,4 @@
-FROM python:3.11-slim-buster
+FROM python:3.11-alpine
 
 #Copia todo o diretório atual para a pasta /cloud dentro do container
 COPY . /cloud/
@@ -11,8 +11,6 @@ RUN python3 -m venv ${VIRTUAL_ENV}
 ENV PATH="${VIRTUAL_ENV}/bin:$PATH"
 
 RUN pip install --no-cache-dir -r requirements.txt
-RUN pip install Flask geopy paho-mqtt
 
-EXPOSE 8000
 # Set the default command to run the application
-CMD ["python", "./cloud.py"]
+CMD ["python", "cloud.py"]
