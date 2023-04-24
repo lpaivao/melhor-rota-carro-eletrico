@@ -62,7 +62,7 @@ flask run
 <div id="image11" style="display: inline_block" align="center">
 		<img src="/imagens/estrutura.png"/><br>
 		<p>
-		Estrutura
+		Imagem 1 - Estrutura
 		</p>
 	</div>
 
@@ -75,7 +75,7 @@ Foram utilizados dois protocolos de comunicação para fazer as entidades se com
 <div id="image11" style="display: inline_block" align="center">
 		<img src="/imagens/comunicacao.png"/><br>
 		<p>
-		Comunicação
+		Imagem 2 - Comunicação
 		</p>
 	</div>
 	
@@ -89,7 +89,7 @@ Existem duas situações possíveis para funcionamento do programa:
 <div id="image11" style="display: inline_block" align="center">
 		<img src="/imagens/sequencia.png"/><br>
 		<p>
-		Diagrama Sequencial
+		Imagem 3 - Diagrama Sequencial
 		</p>
 	</div>
 
