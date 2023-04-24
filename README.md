@@ -57,7 +57,7 @@ flask run
 - Os carros: estão inseridos em uma determinada névoa porém, eles podem migrar para outra névoa
 - Os postos: também estão inseridos em uma determinada névoa, mas como ele não se mexe, ele fica conectado à mesma névoa sempre.
 - As névoas: contém 1 ou mais postos; contém também 0 ou mais carros. As névoas estão inseridas em uma única nuvem.
-- A nuvem: Possui apenas uma única nuvem, que tem acesso a todas as névoas.
+- A nuvem: Há apenas uma única nuvem, que tem acesso a todas as névoas.
 
 <div id="image11" style="display: inline_block" align="center">
 		<img src="/imagens/estrutura.png"/><br>
