@@ -37,7 +37,7 @@ class Cloud:
         self.client.on_connect = self.on_connect
 
         try:
-            self.client.connect('172.16.103.3', 1883, 60)
+            self.client.connect('172.16.103.3', 1884, 60)
         except ConnectionRefusedError as e:
             print(e)
             print("Não foi possível conectar ao Broker MQTT")
@@ -74,6 +74,8 @@ class Cloud:
     def _handle_fognode(self, connection, address):
         with connection:
             # Aqui ocorre o processo de trocar o carro de nó
+            print("A new connection was made!")
+            print(connection)
             while True:
                 try:
                     data = connection.recv(1024)
@@ -82,6 +84,7 @@ class Cloud:
 
                     # Decodifica a mensagem
                     message = data.decode("utf-8")
+                    print(message)
                     message = json.loads(message)
                     fog_id = message["fog_id"]
 
@@ -117,12 +120,13 @@ class Cloud:
 
             self._fognodes.remove(connection)
             connection.close()
-            threading.current_thread().join()
+        threading.current_thread().join()
 
 
 if __name__ == '__main__':
     print("Ola sou um container!")
     HOST = host = socket.gethostbyname(socket.gethostname())
-    PORT = 8000
+    PORT = 8001
     my_cloud = Cloud(1, HOST, PORT)
-    app.run()
+    app.run(port=5001)
+
