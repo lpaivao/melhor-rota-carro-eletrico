@@ -29,15 +29,15 @@ log_timestamp true
 :wq!
 
 ## build cloud image
-docker build -t pbl2-cloud:1.0 cloud
+docker build -t pbl2-cloud cloud
 
 ## start cloud
 docker run -d \
 --net pbl2-network \
 --name cloud \
-pbl2-cloud:1.0
+pbl2-cloud
 
-docker run -it my-app python app.py --ip 192.168.1.100 --port 8080
+docker run -it my-app python app.py
 
 
 ## docker network commands

@@ -1,6 +1,7 @@
 import json
-import argparse
-from flask import Flask, jsonify
+import time
+from flask import Flask
+from flask_restful import Resource, Api
 import socket
 import threading
 from geopy import Point
@@ -8,13 +9,15 @@ import paho.mqtt.client as mqtt
 import functions
 
 app = Flask(__name__)
+api = Api(app)
 
 
-@app.route("/", methods=['GET'])
-def hello():
-    return jsonify({"message": "Hello, World!",
-                    "error": False
-                    })
+class Hello(Resource):
+    def get(self):
+        return {'hello': 'world'}
+
+
+api.add_resource(Hello, '/')
 
 
 nevoas_var = {
@@ -34,7 +37,7 @@ class Cloud:
         self.client.on_connect = self.on_connect
 
         try:
-            self.client.connect('127.0.0.1', 1883, 60)
+            self.client.connect('172.16.103.3', 1883, 60)
         except ConnectionRefusedError as e:
             print(e)
             print("Não foi possível conectar ao Broker MQTT")
@@ -53,11 +56,7 @@ class Cloud:
         self.sentinelthread.start()
 
         self._fognodes = []
-
-        # Colocar uma queue de verdade (se tiver de usar uma queue!). Pode até ser priority(o comando a ser executado mais rápido é o que tem o carro com menor bateria)
-        self._command_queue = {}
-
-        self.client.loop_forever()
+        self.client.loop_start()
 
     def on_connect(self, client, userdata, flags, rc):
         print(f'Conectado ao Broker! Código de retorno {rc}')
@@ -68,16 +67,13 @@ class Cloud:
         while True:
             conn, addr = socket.accept()
             self._fognodes.append(conn)
-            print(len(self._fognodes))
             thread = threading.Thread(
                 target=self._handle_fognode, args=[conn, addr])
             thread.start()
 
     def _handle_fognode(self, connection, address):
         with connection:
-            print(threading.current_thread().name)
-
-            # Fazer aqui o processo de trocar o carro de nó
+            # Aqui ocorre o processo de trocar o carro de nó
             while True:
                 try:
                     data = connection.recv(1024)
@@ -123,36 +119,9 @@ class Cloud:
             connection.close()
             threading.current_thread().join()
 
-    def _on_node_message(self):
-        pass
-
 
 if __name__ == '__main__':
-    """
-    client = docker.from_env()
-    container = client.containers.get('my-container')
-    network = client.networks.get('my-network')
-    container_ip = network.attrs['Containers'][container.id]['IPv4Address']
-    """
-
-    """
-    print(f"The IP address of container {container.name} on network {network.name} is {container_ip}")
-    parser = argparse.ArgumentParser(
-        description='TEC502:PBL2:2023.1 - Sets up the network config of the cloud')
-    parser.add_argument('--ip', help='IP address', required=True)
-    parser.add_argument('--port', metavar='PORT', type=int, default=8000,
-                        help='TCP port (default 8000)', required=True)
-    parser.add_argument(
-        '--mosquitto_ip', help='Mosquitto IP address', required=True)
-    parser.add_argument('--mosquitto_port', metavar='MOSQUITTO_PORT', type=int, default=1883,
-                        help='Mosquitto port (default 1883)', required=True)
-    args = parser.parse_args()
-
-    HOST = args.ip
-    PORT = args.port    
-    
-    """
-    HOST = '127.0.0.1'
+    HOST = '172.16.103.4'
     PORT = 8000
-    print(f"The cloud is listening on: ({HOST}:{PORT})")
     my_cloud = Cloud(1, HOST, PORT)
+    app.run()
