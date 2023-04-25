@@ -9,6 +9,13 @@ import threading
 import os
 
 
+from dotenv import load_dotenv
+import os
+
+# Carrega as variáveis do arquivo .env
+load_dotenv()
+
+
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
 
@@ -18,7 +25,6 @@ os.environ['TERM'] = 'xterm'
 posto = {'id_posto': 0, 'latitude': -23.5440,
          'longitude': -46.6340, 'fila': 0, 'vaga': True}
 
-
 # Função que será executada se o tempo limite for atingido
 def on_timeout(self):
     print("Tempo limite de resposta excedido.")
@@ -26,13 +32,16 @@ def on_timeout(self):
 
 class Car:
     def __init__(self, id_carro, bateria, max_distance_per_charge, melhor_posto=posto, latitude=-23.5450,
-                 longitude=-46.6355, fog_prefix="fog", fog_id=1):
+                 longitude=-46.6355, fog_prefix="fog", fog_id=1,port = 1884,host='localhost'):
         # Prefixo de qual nuvem o carro está no momento
         self.fog_prefix = fog_prefix
         # ID na nevoa
         self.fog_id = fog_id
         # Dicionário com as informações do melhor posto desde a última solicitação
         self.melhor_posto = melhor_posto
+
+        self.PORT = port
+        self.HOST = host
 
         self.carro_pode_andar = False
         self.posto_respondeu = False
@@ -48,10 +57,10 @@ class Car:
         self.bateria = bateria
 
         # Configura cliente mqtt
-        self.client = mqtt.Client()
+        self.client = mqtt.Client(client_id=f"Carro {id_carro}")
         self.client.on_connect = self.on_connect
         self.client.on_message = self.on_message
-        self.client.connect("172.16.103.3", 1884, 60)
+        self.client.connect("localhost", self.PORT, 60)
         # Socket para se comunicar com a nuvem
         self.server = None
 
@@ -267,6 +276,17 @@ class Car:
 
 
 if __name__ == '__main__':
-    carro = Car(1, 16, 200)
-    time.sleep(1)
-    carro.run()
+   # carro = Car(2, 16, 200)
+   carro = Car(
+    os.getenv("id_carro"),
+    os.getenv("bateria"),
+    os.getenv("max_distance_per_charge"),
+    latitude=float(os.getenv("latitude")),
+    longitude=float(os.getenv("longitude")),
+    fog_prefix=os.getenv("fog_prefix"),
+    fog_id=int(os.getenv("fog_id")),
+    port=int(os.getenv("port")),
+    host=os.getenv("host"))
+   
+   time.sleep(1)
+   carro.run()
