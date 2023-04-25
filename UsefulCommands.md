@@ -53,7 +53,7 @@ pbl2-cloud
 
 # To get into a shell's container
 
-docker exec -it TEC502-PBL2-An.La.Lu-mosquitto /bin/sh
+docker exec -it <docker-container> /bin/sh
 
 ## docker network commands
 

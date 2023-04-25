@@ -18,7 +18,7 @@ postos_disponiveis = {
 
 
 class Fog:
-    def __init__(self, fog_prefix="fog", fog_id=1, postos=postos_disponiveis, host='localhost', http_port=65136, http_host='localhost'):
+    def __init__(self, fog_prefix="fog", fog_id=1, postos=postos_disponiveis, host='localhost', http_port=8001, http_host='172.16.103.4'):
         # Prefixo de qual nuvem o carro está no momento
         self.fog_prefix = fog_prefix
         # ID na nevoa
@@ -32,10 +32,10 @@ class Fog:
         self.http_port = http_port
         self.server = None
 
-        self.client = mqtt.Client()
+        self.client = mqtt.Client(client_id=f"Fog {self.fog_id}")
         self.client.on_connect = self.on_connect
         self.client.on_message = self.on_message
-        self.client.connect(host, 1883, 60)
+        self.client.connect(host, 1884, 60)
         # self.client.loop_start()
 
         self.connection_thread = threading.Thread(
@@ -205,6 +205,4 @@ class Fog:
 
 
 if __name__ == '__main__':
-    id = int(input("Insira o Id da nevoa"))
-    nuvem_host = input("Insira o host da nuvem")
-    fog = Fog("fog", id)
+    fog = Fog()
