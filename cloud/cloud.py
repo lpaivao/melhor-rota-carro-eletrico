@@ -28,7 +28,7 @@ nevoas_var = {
 
 
 class Cloud:
-    def __init__(self, id, host, port, nevoas=nevoas_var):
+    def __init__(self, id, host="localhost", port=8000, nevoas=nevoas_var):
         self.id = id
         self.nevoas = nevoas
 
@@ -121,7 +121,8 @@ class Cloud:
 
 
 if __name__ == '__main__':
-    HOST = '172.16.103.4'
+    print("Ola sou um container!")
+    HOST = host = socket.gethostbyname(socket.gethostname())
     PORT = 8000
     my_cloud = Cloud(1, HOST, PORT)
     app.run()
