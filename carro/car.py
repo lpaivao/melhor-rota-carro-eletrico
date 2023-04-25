@@ -9,6 +9,13 @@ import threading
 import os
 
 
+from dotenv import load_dotenv
+import os
+
+# Carrega as variáveis do arquivo .env
+load_dotenv()
+
+
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
 
@@ -17,7 +24,6 @@ os.environ['TERM'] = 'xterm'
 
 posto = {'id_posto': 0, 'latitude': -23.5440,
          'longitude': -46.6340, 'fila': 0, 'vaga': True}
-
 
 # Função que será executada se o tempo limite for atingido
 def on_timeout(self):
@@ -270,6 +276,18 @@ class Car:
 
 
 if __name__ == '__main__':
-    carro = Car(2, 16, 200)
-    time.sleep(1)
-    carro.run()
+   # carro = Car(2, 16, 200)
+   carro = Car(
+    os.getenv("id_carro"),
+    os.getenv("bateria"),
+    os.getenv("max_distance_per_charge"),
+    melhor_posto=os.getenv("posto"),
+    latitude=float(os.getenv("latitude")),
+    longitude=float(os.getenv("longitude")),
+    fog_prefix=os.getenv("fog_prefix"),
+    fog_id=int(os.getenv("fog_id")),
+    port=int(os.getenv("port")),
+    host=os.getenv("host"))
+   
+   time.sleep(1)
+   carro.run()
