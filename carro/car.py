@@ -26,13 +26,16 @@ def on_timeout(self):
 
 class Car:
     def __init__(self, id_carro, bateria, max_distance_per_charge, melhor_posto=posto, latitude=-23.5450,
-                 longitude=-46.6355, fog_prefix="fog", fog_id=1):
+                 longitude=-46.6355, fog_prefix="fog", fog_id=1,port = 1884,host='localhost'):
         # Prefixo de qual nuvem o carro está no momento
         self.fog_prefix = fog_prefix
         # ID na nevoa
         self.fog_id = fog_id
         # Dicionário com as informações do melhor posto desde a última solicitação
         self.melhor_posto = melhor_posto
+
+        self.PORT = port
+        self.HOST = host
 
         self.carro_pode_andar = False
         self.posto_respondeu = False
@@ -51,7 +54,7 @@ class Car:
         self.client = mqtt.Client(client_id=f"Carro {id_carro}")
         self.client.on_connect = self.on_connect
         self.client.on_message = self.on_message
-        self.client.connect("localhost", 1883, 60)
+        self.client.connect("localhost", self.PORT, 60)
         # Socket para se comunicar com a nuvem
         self.server = None
 
