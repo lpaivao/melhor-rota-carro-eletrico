@@ -12,9 +12,9 @@ import requests
 # fila = quantos carros tem na fila
 # espera = tempo de espera
 postos_disponiveis = {
-    '0': {'id_posto': 0, 'latitude': -23.5440, 'longitude': -46.6340, 'fila': 0, 'vaga': True},
-    '1': {'id_posto': 1, 'latitude': -23.5450, 'longitude': -46.6350, 'fila': 2, 'vaga': True},
-    '2': {'id_posto': 2, 'latitude': -23.5560, 'longitude': -46.6360, 'fila': 3, 'vaga': True}
+    '0': {'id_posto': 0, 'latitude': -23.5440, 'longitude': -46.6340, 'fila': 0, 'vaga': True, 'conectado': False},
+    '1': {'id_posto': 1, 'latitude': -23.5450, 'longitude': -46.6350, 'fila': 2, 'vaga': True, 'conectado': False},
+    '2': {'id_posto': 2, 'latitude': -23.5560, 'longitude': -46.6360, 'fila': 3, 'vaga': True, 'conectado': False}
 }
 
 
@@ -77,7 +77,10 @@ class Fog:
                 if topic[2] == "vaga_status":
                     id_posto = str(msg["id_posto"])
                     fila = msg["fila"]
+                    conectado = msg["conectado"]
                     self.postos[id_posto]["fila"] = fila
+                    self.postos[id_posto]["conectado"] = conectado
+                    print(f"Posto {id_posto} conectado")
 
                 elif topic[2] == "alocando_carro":
                     id_posto = str(msg["id_posto"])
@@ -206,6 +209,22 @@ class Fog:
 
     def __del__(self):
         self.connection_thread.join()
+        
+        
+    def desconectar_nevoa(self):
+        while True:
+            try:
+                pass
+            except KeyboardInterrupt:
+                payload = {
+                    "fog_id": self.fog_id,
+                    "conectado": False
+                }
+
+                payload = json.dumps(payload)
+
+                self.server.sendall(payload.encode())
+
 
 
 if __name__ == '__main__':
