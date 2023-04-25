@@ -7,6 +7,7 @@ import json
 import socket
 import threading
 import datetime
+import requests
 
 # fila = quantos carros tem na fila
 # espera = tempo de espera
@@ -30,7 +31,7 @@ class Fog:
         self.host = host
         self.http_host = http_host
         self.http_port = http_port
-        self.server = None
+        self.connection_to_server = None
 
         self.client = mqtt.Client(client_id=f"Fog {self.fog_id}")
         self.client.on_connect = self.on_connect
@@ -175,15 +176,18 @@ class Fog:
 
     def _connect_to_cloud(self):
         current_time = datetime.datetime.now()
+        self.connection_to_server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.connection_to_server.connect((self.http_host, self.http_port))
         print(f"[{current_time}] - Connected to cloud")
-        self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.server.connect((self.http_host, self.http_port))
+        str_tosend = f"Fog {self.fog_id}"
+        send = bytearray(str_tosend,'utf-8')
+        self.connection_to_server.sendall(send)
 
     def send_car_request_change_fog(self, request):
-        self.server.sendall(request.encode())
+        self.connection_to_server.sendall(request.encode())
 
     def recive_car_request_change_fog(self, request):
-        response = self.server.recv(1024)
+        response = self.connection_to_server.recv(1024)
         return response.decode()
 
     def car_request(self, id_carro, latitude, longitude, max_distance_per_charge):
