@@ -1,10 +1,8 @@
-FROM python:3.10.9-bullseye
-
-WORKDIR /car
+FROM python:3-alpine
 
 COPY . /car
 
-COPY requirements.txt .
+WORKDIR /car
 
 RUN pip install -r requirements.txt
 

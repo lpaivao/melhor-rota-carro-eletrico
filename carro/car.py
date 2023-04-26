@@ -52,7 +52,8 @@ class Car():
                     self.wfile.write(content.encode('utf-8'))
                 else:
                     self.send_error(404)
-    def __init__(self, id_carro, bateria, max_distance_per_charge, host="localhost",port=1883, melhor_posto=posto, latitude=-23.5450,
+                    
+    def __init__(self, id_carro, bateria, max_distance_per_charge, host="localhost",broker_host="172.16.103.3",broker_port=1884, melhor_posto=posto, latitude=-23.5450,
                  longitude=-46.6355, fog_prefix="fog", fog_id=1):
         # Prefixo de qual nuvem o carro está no momento
         self.fog_prefix = fog_prefix
@@ -88,10 +89,12 @@ class Car():
         self.bateria = bateria
 
         # Configura cliente mqtt
-        self.client = mqtt.Client()
+        self.client = mqtt.Client(client_id=f"Carro {self.id_carro}")
         self.client.on_connect = self.on_connect
         self.client.on_message = self.on_message
-        self.client.connect(host, port, 60)
+        self.client.connect(broker_host, broker_port, 60)
+        
+        
         # Socket para se comunicar com a nuvem
         self.server = None
 
@@ -349,6 +352,11 @@ class Car():
             
 
 if __name__ == '__main__':
-    carro = Car(1, 16, 200)
     
+    id = int(input("Insira o id do carro: "))
+    bateria = int(input("Insira o nivel inicial de carga da bateria: "))
+    max_distance = int(input("Insira a distância máxima que o carro pode percorrer até ficar sem bateria (autonomia): "))
+    
+    carro = Car(id, bateria, max_distance)
     carro.drive()
+    
