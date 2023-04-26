@@ -36,9 +36,6 @@ class Car:
 
         self.carro_pode_andar = False
         self.posto_respondeu = False
-        self.timer1 = None
-        self.timer2 = None
-        self.timer3 = None
         # Distância máxima que o carro pode percorrer com carga máxima
         self.max_distance_per_charge = max_distance_per_charge
 
@@ -51,7 +48,7 @@ class Car:
         self.client = mqtt.Client()
         self.client.on_connect = self.on_connect
         self.client.on_message = self.on_message
-        self.client.connect("172.16.103.3", 1884, 60)
+        self.client.connect("172.16.103.14", 1883, 60)
         # Socket para se comunicar com a nuvem
         self.server = None
 

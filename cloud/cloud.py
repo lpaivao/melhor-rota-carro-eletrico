@@ -1,46 +1,37 @@
 import json
-import time
-from flask import Flask
-from flask_restful import Resource, Api
+
+from flask import Flask, request, jsonify
 import socket
 import threading
+
 from geopy import Point
 import paho.mqtt.client as mqtt
+
 import functions
 
 app = Flask(__name__)
-api = Api(app)
 
 
-class Hello(Resource):
-    def get(self):
-        return {'hello': 'world'}
-
-
-api.add_resource(Hello, '/')
+@app.route("/", methods=['GET'])
+def hello():
+    return jsonify({"message": "Hello, World!",
+                    "error": False
+                    })
 
 
 nevoas_var = {
     "0": {"fog_id": 0, "ponto_central": Point(-23.5450, -46.6350), "conectado": False},
-    "1": {"fog_id": 1, "ponto_central": Point(-23.5600, -46.6600), "conectado": False},
-    "2": {"fog_id": 2, "ponto_central": Point(-23.5480, -46.6380), "conectado": False}
+    "1": {"fog_id": 1, "ponto_central": Point(-23.5600, -46.6600), "conectado": False}
 }
 
 
 class Cloud:
-    def __init__(self, id, host="localhost", port=8000, nevoas=nevoas_var):
-        self.id = id
+    def __init__(self, host, port, nevoas=nevoas_var):
         self.nevoas = nevoas
-
         # Conexão MQTT
-        self.client = mqtt.Client(client_id=f"Cloud {self.id}")
+        self.client = mqtt.Client()
         self.client.on_connect = self.on_connect
-
-        try:
-            self.client.connect('172.16.103.3', 1884, 60)
-        except ConnectionRefusedError as e:
-            print(e)
-            print("Não foi possível conectar ao Broker MQTT")
+        self.client.connect('172.16.103.14', 1883, 60)
 
         # Conexão sock
         self.host = host
@@ -56,8 +47,11 @@ class Cloud:
         self.sentinelthread.start()
 
         self._fognodes = []
-        self.client.loop_start()
 
+        # Colocar uma queue de verdade (se tiver de usar uma queue!). Pode até ser priority(o comando a ser executado mais rápido é o que tem o carro com menor bateria)
+        self._command_queue = {}
+
+        self.client.loop_forever()
     def on_connect(self, client, userdata, flags, rc):
         print(f'Conectado ao Broker! Código de retorno {rc}')
         topic_sub = f"cloud/fog_connect"
@@ -67,15 +61,17 @@ class Cloud:
         while True:
             conn, addr = socket.accept()
             self._fognodes.append(conn)
+            print(len(self._fognodes))
             thread = threading.Thread(
                 target=self._handle_fognode, args=[conn, addr])
             thread.start()
 
     def _handle_fognode(self, connection, address):
+
         with connection:
-            # Aqui ocorre o processo de trocar o carro de nó
-            print("A new connection was made!")
-            print(connection)
+            print(threading.current_thread().name)
+
+            # Fazer aqui o processo de trocar o carro de nó
             while True:
                 try:
                     data = connection.recv(1024)
@@ -84,7 +80,6 @@ class Cloud:
 
                     # Decodifica a mensagem
                     message = data.decode("utf-8")
-                    print(message)
                     message = json.loads(message)
                     fog_id = message["fog_id"]
 
@@ -110,8 +105,7 @@ class Cloud:
                         # Tópico para enviar a mensagem
                         topic_pub = f"cloud/fog_change/{id_carro}"
                         # Envia mensagem
-                        print(
-                            f"Mudando carro {id_carro} da nevoa {fog_id} para a nevoa {nova_nevoa_id}")
+                        print(f"Mudando carro {id_carro} da nevoa {fog_id} para a nevoa {nova_nevoa_id}")
                         self.client.publish(topic_pub, response)
 
                 except socket.error:
@@ -120,13 +114,14 @@ class Cloud:
 
             self._fognodes.remove(connection)
             connection.close()
-        threading.current_thread().join()
+            threading.current_thread().join()
+
+    def _on_node_message(self):
+        pass
 
 
 if __name__ == '__main__':
-    print("Ola sou um container!")
-    HOST = host = socket.gethostbyname(socket.gethostname())
-    PORT = 8001
-    my_cloud = Cloud(1, HOST, PORT)
-    app.run(port=5001)
-
+    HOST = 'localhost'
+    PORT = 8000
+    print(f"The cloud is listening on: ({HOST}:{PORT})")
+    my_cloud = Cloud(HOST, PORT)

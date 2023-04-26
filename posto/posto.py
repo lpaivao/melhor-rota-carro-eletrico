@@ -1,9 +1,9 @@
+import random
 import paho.mqtt.client as client
 import json
 import schedule
 import threading
 import time
-import functions
 
 
 class Posto:
@@ -81,8 +81,7 @@ class Posto:
                 }))
 
     def publish_status(self):
-        current_time = functions.format_time()
-        print(f"[{current_time}]: Estou publicando status")
+        print("Estou publicando status")
         self.client.publish(self.__STATUS, json.dumps({
             "id_posto": self.ID_POSTO,
             "fila": self.fila,
@@ -120,14 +119,10 @@ class Posto:
 
 
 if __name__ == '__main__':
-
-    id = int(input("Insira o id do posto"))
-    lat = float(input("Insira a latitude do posto"))
-    lgn = float(input("Insira a longitude do posto"))
-    id_nevoa = int(input("Insira o id da nevoa associada"))
-    host = input("Insira o host do broker")
-    port = int(input('Insira a porta do broker'))
-
-    posto = Posto(id,lat,lgn,id_nevoa,BROKER_HOST=host,BROKER_PORT=port)
+    posto = Posto(ID_POSTO=1, BROKER_HOST="172.16.103.14")
 
     posto.posto_disconnect()
+
+
+
+

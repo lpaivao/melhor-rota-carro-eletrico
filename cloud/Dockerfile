@@ -1,13 +1,30 @@
-FROM python:3.10.9-bullseye
+FROM python:3.8-slim-buster
 
-#Copia todo o diretório atual para a pasta /cloud dentro do container
-COPY . /cloud
+# Install dependencies
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    build-essential \
+    libpq-dev \
+    && \
+    rm -rf /var/lib/apt/lists/*
 
-# Esse commando é como o comando 'cd' no terminal
+# Set the working directory to /app
 WORKDIR /cloud
 
-RUN pip install --no-cache-dir -r requirements.txt
+# Copy the requirements file into the container
+COPY requirements.txt .
 
-EXPOSE 8000/tcp
+# Install the dependencies
+RUN python -m venv venv && \
+    . venv/bin/activate && \
+    pip install --upgrade pip && \
+    pip install -r requirements.txt
+
+# Copy the rest of the application code into the container
+COPY . .
+
+# Expose the port on which the application will run
+EXPOSE 5000
+
 # Set the default command to run the application
-CMD ["python", "cloud.py"]
+CMD [ "venv/bin/python", "cloud.py" ]
