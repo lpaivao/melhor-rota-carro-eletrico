@@ -7,7 +7,9 @@ from geopy.distance import distance
 import topics
 import threading
 import os
-
+import socket
+from http.server import BaseHTTPRequestHandler,HTTPServer
+from http_server import RequestHandler
 
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -24,8 +26,33 @@ def on_timeout(self):
     print("Tempo limite de resposta excedido.")
 
 
-class Car:
-    def __init__(self, id_carro, bateria, max_distance_per_charge, melhor_posto=posto, latitude=-23.5450,
+class Car():
+    class RequestHandler(BaseHTTPRequestHandler):
+        def __init__(self,car_instance,*args,**kwargs):
+            self.car = car_instance
+            super().__init__(*args,**kwargs)
+        def do_GET(self):
+                if self.path == '/':
+                    self.send_response(200)
+                    self.send_header('Content-type', 'text/html')
+                    self.end_headers()
+                    self.wfile.write(b'Amg,estou funcionando')
+                elif self.path == '/bateria':
+                    self.send_response(200)
+                    content = f'<html><body><h1>Bateria Level: {self.car.bateria}!</h1></body></html>'
+                    self.send_header('Content-type', 'text/html')
+                    self.end_headers()
+                    self.wfile.write(content.encode('utf-8'))
+                
+                elif self.path == '/betterStation':
+                    self.send_response(200)
+                    content = f'<html><body><h1>Melhor Posto: {self.car.melhor_posto}!</h1></body></html>'
+                    self.send_header('Content-type', 'text/html')
+                    self.end_headers()
+                    self.wfile.write(content.encode('utf-8'))
+                else:
+                    self.send_error(404)
+    def __init__(self, id_carro, bateria, max_distance_per_charge, host="localhost",port=1883, melhor_posto=posto, latitude=-23.5450,
                  longitude=-46.6355, fog_prefix="fog", fog_id=1):
         # Prefixo de qual nuvem o carro está no momento
         self.fog_prefix = fog_prefix
@@ -33,6 +60,19 @@ class Car:
         self.fog_id = fog_id
         # Dicionário com as informações do melhor posto desde a última solicitação
         self.melhor_posto = melhor_posto
+
+        #tcp
+        '''
+        self.server_socket = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+        self.__run_server = True
+        self.server_socket.bind(("localhost",8035))
+        self.server_socket.listen()'''
+
+        #self.http_server = HTTPServer(('localhost',8080),self.RequestHandler)
+        self.http_server = HTTPServer((host, 8080), lambda *args, **kwargs: self.RequestHandler(self, *args, **kwargs))
+
+        self.tcp_look = threading.Lock()
+        self.mqtt_look = threading.Lock()
 
         self.carro_pode_andar = False
         self.posto_respondeu = False
@@ -51,7 +91,7 @@ class Car:
         self.client = mqtt.Client()
         self.client.on_connect = self.on_connect
         self.client.on_message = self.on_message
-        self.client.connect("172.16.103.3", 1884, 60)
+        self.client.connect(host, port, 60)
         # Socket para se comunicar com a nuvem
         self.server = None
 
@@ -240,33 +280,75 @@ class Car:
 
         # Diminui a vida da bateria
         self.diminui_bateria(distancia)
+    
+    '''
+    def start_tcp(self):
+        with self.tcp_look:
+            while self.__run_server:
+                conex, addr = self.server_socket.accept()
+                print(f'Conectado de {addr}')
+                thread = threading.Thread(target= self.handle_connection, args=(conex, addr))
+                thread.start()
+        
+    def handle_connection(self,conex,addr):
+        print(conex)
+        request = conex.recv(1024).decode()
+        print(repr(request))
+        response = 'HTTP/1.1 404 Not Found\r\nContent-Length: 9\r\n\r\nNot found'
+        if request:
+            method, path, *restante = request.split(' ')
+        
+            if path == '/' and method=='GET':
+                response = f'HTTP/1.1 200 OK\r\nContent-Length: 9\r\n\r\nOla Mundo'
+
+            elif method== 'GET' and path == '/bateria':
+                print('Entrei')
+                response = f'HTTP/1.1 200 ok\r\nContent-Length: 20\r\n\r\n{self.bateria}'
+                conex.sendall(response.encode())
+                conex.close()
+                '''
 
     def run(self):
-        try:
-            while self.bateria > 0:
-                # Simula o carro andando aleatoriamente as coordenadas
-                lat, lon = random.uniform(-0.0005,
-                                          0.0005), random.uniform(-0.0005, 0.0005)
-                self.mover(lat, lon)
-                """
-                    Verifica se a bateria está baixa e se já não 
-                    tem um processamento de envio de bateria baixa
-                """
-                if self.bateria < 15:
-                    #self.envia_bateria_baixa()
-                    thread = threading.Thread(
-                        target=self.envia_bateria_baixa)
-                    thread.start()
-                    self.carro_pode_andar = False
-                    while not self.carro_pode_andar:
-                        time.sleep(1)
+       # with self.mqtt_look:
+                    while self.bateria > 0:
+                        # Simula o carro andando aleatoriamente as coordenadas
+                        lat, lon = random.uniform(-0.0005,
+                                                0.0005), random.uniform(-0.0005, 0.0005)
+                        self.mover(lat, lon)
+                        """
+                            Verifica se a bateria está baixa e se já não 
+                            tem um processamento de envio de bateria baixa
+                        """
+                        if self.bateria < 15:
+                            #self.envia_bateria_baixa()
+                            thread = threading.Thread(
+                                target=self.envia_bateria_baixa)
+                            thread.start()
+                            self.carro_pode_andar = False
+                            while not self.carro_pode_andar:
+                                time.sleep(1)
 
-                time.sleep(3)
-        except KeyboardInterrupt:
-            self.parar()
+                        time.sleep(10)
+    def start(self):
+        self.http_server.serve_forever()
 
+    def stop(self):
+         self.http_server.shutdown()
+        
+    def drive(self):
+        while True:
+            thread_tcp = threading.Thread(target=self.start)
+            thread_tcp.start()
+
+            thread_mqtt = threading.Thread(target=self.run)
+            thread_mqtt.start()
+
+            #thread_mqtt.join()
+            #thread_tcp.join()
+            
+            
 
 if __name__ == '__main__':
     carro = Car(1, 16, 200)
-    time.sleep(1)
-    carro.run()
+    
+    carro.drive()
