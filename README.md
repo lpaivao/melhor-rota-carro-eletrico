@@ -35,17 +35,31 @@ venv\Scripts\activate
 
 ## Introdução
 
-Nos próximos anos, é esperado o surgimento de bilhões de novos objetos com capacidade de coletar, trocar informações e interagir com o ambiente de maneira inteligente. Contudo, a integração desses elementos para beneficiar simultaneamente diferentes setores da sociedade demanda grandes desafios, como parte do que está sendo chamada a Internet das Coisas. Ambientes de Iot são caracterizados por diferentes tipos de conexão entre dispositivos heterogêneos, dispostos de forma local ou amplamente distribuídos com capacidades de comunicação, armazenamento e processamento limitados. Sua implementação envolve diferentes questões como confiabilidade, performance, segurança e privacidade [Atzori et al. 2010] [Gubbi et al. 2013] [Sehgal et al. 2012].
+Nos próximos anos, é esperado o surgimento de bilhões de novos objetos com capacidade de coletar, trocar informações e interagir com o ambiente de maneira inteligente. Contudo, a integração desses elementos para beneficiar simultaneamente diferentes setores da sociedade demanda grandes desafios, como parte do que está sendo chamada a Internet das Coisas. Ambientes de Iot são caracterizados por diferentes tipos de conexão entre dispositivos heterogêneos, dispostos de forma local ou amplamente distribuídos com capacidades de comunicação, armazenamento e processamento limitados. Sua implementação envolve diferentes questões como confiabilidade, performance, segurança e privacidade [Coutinho et al 2016].
 
-Entre as diferentes propostas sobre Internet das Coisas vem se agregando a Computação em Nuvem e Computação em Névoa, enquanto a Nuvem oferece solução centrada, a Névoa fornece uma solução distribuída. A Computação em Névoa vem atraindo interesse pelo seu potencial de satisfazer requisitos que não são atendidos por um modelo centralizado em Nuvem [Khalid et al. 2016]. Este paradigma estende os recursos computacionais disponíveis na Nuvem para a borda da rede visando apoio às soluções em IoT. Dessa forma, possibilita a execução de aplicativos em bilhões de objetos conectados para fornecer dados, processamento, armazenamento e serviços aos usuários. Sua arquitetura introduz o suporte à análise de dados em tempo real, distribuindo o processamento analítico através dos recursos na Névoa [Bonomi et al. 2014].
+Entre as diferentes propostas sobre Internet das Coisas vem se agregando a Computação em Nuvem e Computação em Névoa, enquanto a Nuvem oferece solução centrada, a Névoa fornece uma solução distribuída. A Computação em Névoa vem atraindo interesse pelo seu potencial de satisfazer requisitos que não são atendidos por um modelo centralizado em Nuvem. Este paradigma estende os recursos computacionais disponíveis na Nuvem para a borda da rede visando apoio às soluções em IoT. Dessa forma, possibilita a execução de aplicativos em bilhões de objetos conectados para fornecer dados, processamento, armazenamento e serviços aos usuários. Sua arquitetura introduz o suporte à análise de dados em tempo real, distribuindo o processamento analítico através dos recursos na Névoa [Coutinho et al 2016].
 
-Pensando nessa tecnologia foi desenvolvido um sistema distribuido para gerênciar filas de postos de recarga para carros elétricos. Onde temos como sistemas finais os carros e os postos, servidores distribuídos por região e uma núvem central que gerencia os servidores distribuidos.
-
-
+Pensando nessa tecnologia foi desenvolvido um sistema distribuido para gerênciar filas de postos de recarga para carros elétricos. Onde temos como sistemas finais os carros e os postos, servidores distribuídos por região e uma núvem central que gerencia os servidores distribuidos. A fim de diminuir o tempo de espera para recarga nas ciadades.
 
 ## Metodologia
 
-### Entidades
+Para encontrar a solução foi desenvolvido quatro softwares: o carro, a névoa, o posto e a nuvem. O carro, é um software que simula o funcionamento de um carro e realiza requisições mqtt com uma névoa. A forma que funcionamento do carro ( como andar, ou regarregar) estão automatizadas para representar a informação de um suposto sistema embarcado. Todavia é possível realizar requisições REST por meio de um cliente para solicitar informações do carro, simulando o display do carro. Esse realizar requisições MQTT para uma névoa
+
+O MQTT é um protocolo de mensagens baseado em padrões, ou conjunto de regras, usado para comunicação de computador para computador. Sensores inteligentes, dispositivos acessórios e outros dispositivos da Internet das Coisas (IoT) normalmente precisam transmitir e receber dados por meio de uma rede com limitação de recursos e largura de banda limitada. Esses dispositivos IoT usam o MQTT para transmissão de dados, pois é fácil de implementar e pode comunicar dados IoT com eficiência. O MQTT oferece suporte a mensagens entre dispositivos para a nuvem e da nuvem para o dispositivo[Amazon Aws]. 
+
+A névoa é um servidor local que atende uma determinada área na cidade, que faz todo o processamento a fim de diminuir o estresse de todo o sistema. Interliga os carros com os postos da região, determinando qual é o melhor posto para um determinado carro fazer a sua recarrga. Enquanto o posto é um software que simula um posto de gasolina, que recebe carros, recarrega e informa seus status a névoa correspondente.
+
+Por fim, a Nuvem, que atua como um servidor central que gerencia os servidores distribuidos, sendo responsável pela troca da névoa de um carro ao deixar determinada zona. Por exemplo, o carro está na zona leste de uma cidade, a qual os dados são processados pela Névoa 1, caso o carro saia da zona, o servidor troca a Névoa a qual o carro publicará e receberá as menssagens.
+
+<div id="image11" style="display: inline_block" align="center">
+		<img src="/imagens/comunicacao.png"/><br>
+		<p>
+		Imagem 1 - Estrutura do Projeto
+		</p>
+	</div>
+	
+
+## Desenvolvimento
 
 #### Carro 
 - O carro uiliza as coordenadas de latitude e longitude para simulação de seu movimento. A medida que ele se move, sua bateria vai reduzindo até que que fique menor do que 15%. Quando fica menor do que 15%, o carro envia um aviso de bateria baixa para a névoa que ele está inserido para poder ocupar a vaga em algum posto.
@@ -62,12 +76,6 @@ Pensando nessa tecnologia foi desenvolvido um sistema distribuido para gerência
 - As névoas: contém 1 ou mais postos; contém também 0 ou mais carros. As névoas estão inseridas em uma única nuvem.
 - A nuvem: Há apenas uma única nuvem, que tem acesso a todas as névoas.
 
-<div id="image11" style="display: inline_block" align="center">
-		<img src="/imagens/estrutura.png"/><br>
-		<p>
-		Imagem 1 - Estrutura
-		</p>
-	</div>
 
 ### Protocolos de comunicação
 Foram utilizados dois protocolos de comunicação para fazer as entidades se comunicarem entre si: MQTT e por Sockets.
@@ -75,13 +83,7 @@ Foram utilizados dois protocolos de comunicação para fazer as entidades se com
 - A comunicação entre névoa-nuvem foi feita através de sockets, pois a entidade da nuvem tem apenas um propósito: receber o aviso de que um carro precisa de trocar de névoa, e fazer essa troca diretamente no carro.
 - A comunicação entre nuvem-carro para a troca de névoa foi feita através do protocolo MQTT, pois o carro que é um dispositivo IOT fica esperando num tópico a resposta para sua névoa ser trocada. A nuvem manda a mensagem justamente para o tópico com o identificador do carro.
 	
-<div id="image11" style="display: inline_block" align="center">
-		<img src="/imagens/comunicacao.png"/><br>
-		<p>
-		Imagem 2 - Comunicação
-		</p>
-	</div>
-	
+
 
 ### Diagrama Sequencial
 
@@ -92,9 +94,23 @@ Existem duas situações possíveis para funcionamento do programa:
 <div id="image11" style="display: inline_block" align="center">
 		<img src="/imagens/sequencia.png"/><br>
 		<p>
-		Imagem 3 - Diagrama Sequencial
+		Imagem 2 - Diagrama Sequencial
 		</p>
 	</div>
 
-# Resultados
-O software é capaz de indicar o posto com menor fila ao carro que faz a requisição. Na possibilidade de não haver postos disponíveis numa área (névoa) para o carro, são feitas novas tentativas até que se encontre num novo posto. Desta forma, os carros são distribuídos de maneira que não acabem sobrecarregando uma área (névoa) com muitos carros, pois logo eles são alocados para outra área (névoa).
+# Conclusão
+Assim temos um sistema que implementa computação em névoa como uma solução para um gerenciador de filas de postos para recarga de carros elétricos, a fim de diminuir o tempo de espera dos motoristas. Por meio de quatro módulos: névoa, nuvem, carro e o posto.
+
+O que faz o sistema ser capaz de indicar o posto com menor fila ao carro que faz a requisição. Na possibilidade de não haver postos disponíveis numa área (névoa) para o carro, são feitas novas tentativas até que se encontre num novo posto. Desta forma, os carros são distribuídos de maneira que não acabem sobrecarregando uma área (névoa) com muitos carros, pois logo eles são alocados para outra área (névoa).
+
+O sistema pode ser melhorado posteriormente ao receber dados reais de um sistema embarcado, a fim de que se torne um projeto possível de ser comercializado.
+
+# Referências
+COUTINHO, A. A. T. R.; CARNEIRO, Elisângela Oliveira; GREVE, Fabíola Gonçalves Pereira. Computaçao em névoa: Conceitos, aplicaç oes e desafios. Minicursos do XXXIV SBRC, p. 266-315, 2016.
+
+AMAZON AWS. O que é MQTT?. Disponível em https://aws.amazon.com/pt/what-is/mqtt/#:~:text=O%20MQTT%20%C3%A9%20um%20protocolo,comunica%C3%A7%C3%A3o%20de%20computador%20para%20computador. Acessado em 27/04/2023
+
+[Sehgal et al. 2012] Sehgal, A., Perelman, V., Kuryla, S., and Schönwälder, J. (2012).
+Management of Resource Constrained Devices in the Internet of Things. Communications Magazine, IEEE, 50(12):144–149.
+
+
