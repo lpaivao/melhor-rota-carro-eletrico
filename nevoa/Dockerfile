@@ -9,7 +9,7 @@ WORKDIR /nevoa
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
-EXPOSE 9090/tcp
+EXPOSE 8000/tcp
 
 # Define o comando padrão para executar a aplicação
 CMD ["python","fog.py"]

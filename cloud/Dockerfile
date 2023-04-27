@@ -8,8 +8,7 @@ WORKDIR /cloud
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-EXPOSE 8001/tcp
-EXPOSE 5001/tcp
+EXPOSE 8000/tcp
 
 # Define o comando padrão para executar a aplicação
 CMD ["python", "cloud.py"]

@@ -1,11 +1,10 @@
-FROM python:3-alpine
+FROM python:3.11-alpine
 
 COPY . /car
 
 WORKDIR /car
 
+RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
-
-EXPOSE 8080/tcp
 
 CMD ["python","car.py"]

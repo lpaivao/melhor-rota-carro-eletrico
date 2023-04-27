@@ -315,8 +315,8 @@ class Car():
          self.http_server.shutdown()
         
     def drive(self):
-        #thread_tcp = threading.Thread(target=self.start)
-        #thread_tcp.start()
+        thread_tcp = threading.Thread(target=self.start)
+        thread_tcp.start()
 
         thread_mqtt = threading.Thread(target=self.run)
         thread_mqtt.start()
@@ -328,6 +328,6 @@ class Car():
 
 if __name__ == '__main__':
     
-    carro = Car(id_carro=1, bateria=16, max_distance_per_charge=200, broker_host="localhost", broker_port=1883)
+    carro = Car(id_carro=1, fog_id=0, bateria=20, max_distance_per_charge=200, broker_host="172.16.103.14", broker_port=1883)
     carro.drive()
     

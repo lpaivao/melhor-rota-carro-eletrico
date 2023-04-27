@@ -46,10 +46,15 @@ class Cloud:
         self.host = host
         self.port = port
 
-        self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.s.bind((self.host, self.port))
-        self.s.listen()
+        try:
+            self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            self.s.bind((self.host, self.port))
+            self.s.listen()
+            print(f"Socket escutando em {self.host}:{self.port}")
+        except Exception as e:
+            print(e)
+            print(f"Não foi possível conectar ao socket em {self.host}:{self.port}")
 
         self.sentinelthread = threading.Thread(
             target=self._handle_conn, args=[self.s])
@@ -124,5 +129,5 @@ class Cloud:
 
 
 if __name__ == '__main__':
-    my_cloud = Cloud(id=1, host="localhost", port=8000, broker_host="localhost", broker_port=1883)
+    my_cloud = Cloud(id=1, host="localhost", port=8000, broker_host="172.16.103.14", broker_port=1883)
     #app.run(port=5001)

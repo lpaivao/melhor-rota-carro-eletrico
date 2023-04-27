@@ -19,7 +19,7 @@ postos_disponiveis = {
 
 
 class Fog:
-    def __init__(self, fog_id=1, postos=postos_disponiveis, broker_host="172.16.103.3",broker_port=1884, cloud_host=8000, cloud_port='localhost'):
+    def __init__(self, fog_id=1, postos=postos_disponiveis, broker_host="172.16.103.3",broker_port=1884, cloud_host="172.16.103.14", cloud_port=8000):
         # Prefixo de qual nuvem o carro está no momento
         self.fog_prefix = "fog"
         # ID na nevoa
@@ -175,6 +175,7 @@ class Fog:
             print(
                 f"[{current_time}] - Connected to cloud no endereço ({self.cloud_host}:{self.cloud_port})")
         except Exception as e:
+            print(f"Falha em conectar em {self.cloud_host}:{self.cloud_port}")
             print(e)
 
     def send_car_request_change_fog(self, request):
@@ -217,5 +218,5 @@ class Fog:
 
 
 if __name__ == '__main__':
-    fog = Fog(fog_id=1, broker_host='localhost', broker_port=1883, cloud_host="localhost", cloud_port=8000)
+    fog = Fog(fog_id=0, broker_host="172.16.103.14", broker_port=1883, cloud_host="172.16.103.14", cloud_port=8001)
     fog.desconectar_nevoa()
