@@ -53,7 +53,7 @@ class Car():
                 else:
                     self.send_error(404)
                     
-    def __init__(self, id_carro, bateria, max_distance_per_charge, host="localhost",broker_host="172.16.103.3",broker_port=1884, melhor_posto=posto, latitude=-23.5450,
+    def __init__(self, id_carro, bateria, max_distance_per_charge, host=socket.gethostbyname(socket.gethostname()),broker_host="172.16.103.3",broker_port=1884, melhor_posto=posto, latitude=-23.5450,
                  longitude=-46.6355, fog_prefix="fog", fog_id=1):
         # Prefixo de qual nuvem o carro está no momento
         self.fog_prefix = fog_prefix
@@ -66,7 +66,7 @@ class Car():
     
 
         #self.http_server = HTTPServer(('localhost',8080),self.RequestHandler)
-        self.http_server = HTTPServer((host, 14000), lambda *args, **kwargs: self.RequestHandler(self, *args, **kwargs))
+        self.http_server = HTTPServer((host, 13000), lambda *args, **kwargs: self.RequestHandler(self, *args, **kwargs))
 
      
 
@@ -323,7 +323,7 @@ class Car():
 
 if __name__ == '__main__':
     
-    carro = Car(id_carro=4, fog_id=1, bateria=20, max_distance_per_charge=200, broker_host="172.16.103.14", broker_port=1884)
+    carro = Car(id_carro=3, fog_id=1, bateria=20, max_distance_per_charge=200, broker_host="172.16.103.14", broker_port=1884)
     time.sleep(1)
     carro.drive()
     

@@ -11,8 +11,6 @@ import datetime
 # fila = quantos carros tem na fila
 # espera = tempo de espera
 postos_disponiveis = {
-    '0': {'id_posto': 0, 'latitude': -23.5440, 'longitude': -46.6340, 'fila': 0, 'vaga': True, 'conectado': False},
-    '1': {'id_posto': 1, 'latitude': -23.5450, 'longitude': -46.6350, 'fila': 0, 'vaga': True, 'conectado': False},
     '2': {'id_posto': 2, 'latitude': -23.5560, 'longitude': -46.6360, 'fila': 0, 'vaga': True, 'conectado': False},
     '3': {'id_posto': 3, 'latitude': -23.5590, 'longitude': -46.6390, 'fila': 0, 'vaga': True, 'conectado': False}
 }

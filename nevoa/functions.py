@@ -55,7 +55,7 @@ def calcular_posto_mais_proximo_menor_fila(postos, latitude, longitude, max_dist
             else:
                 # Se a distância for menor que a distância que o carro percorre com a bateria toda carregada
                 # e o tempo de espera for o menor, atualiza o posto mais próximo
-                if postos[posto]["vaga"] == True:
+                if postos[posto]["vaga"] == True and postos[posto]["conectado"] is True:
                     if distancia <= max_distance_per_charge and postos[posto]["fila"] < posto_mais_proximo['fila']:
                         nome_mais_proximo = posto
                         posto_mais_proximo = postos[posto]

@@ -17,7 +17,7 @@ class Posto:
 
         self.BROKER_HOST = BROKER_HOST
         self.BROKER_PORT = BROKER_PORT
-        self.client = client.Client(client_id=f"Posto {self.ID_POSTO}")
+        self.client = client.Client()
         self.client.on_connect = self.on_connect
         self.client.on_message = self.on_message
         self.client.connect(BROKER_HOST, BROKER_PORT, 60)
@@ -31,12 +31,13 @@ class Posto:
 
         mqtt_thread = threading.Thread(target=self.client.loop_forever)
         mqtt_thread.start()
-
-        # self.client.loop_forever()
+        
         while True:
             schedule.run_pending()
             time.sleep(1)
-
+        
+        #self.client.loop_start()
+        
     def on_connect(self, client, usardata, flags, rc):
         print(f"Posto {self.ID_POSTO}")
         print("Conectado")
@@ -46,7 +47,6 @@ class Posto:
             "fila": self.fila,
             "conectado": True
         }))
-        thread = threading.Thread(target=self.desconectar_posto)
 
     def on_message(self, client, data, message):
         topic = message.topic.split("/")
@@ -100,6 +100,7 @@ class Posto:
         payload = json.dumps(payload)
         self.client.publish(topic_pub, payload)
         self.publish_status()
+        self.subtrair_fila()
 
     def subtrair_fila(self):
         if self.fila > 0:
@@ -110,7 +111,7 @@ class Posto:
         while True:
             try:
                 pass
-            except KeyboardInterrupt:
+            except Exception:
                 self.client.publish(self.__STATUS, json.dumps({
                     "id_posto": self.ID_POSTO,
                     "fila": self.fila,
@@ -121,3 +122,5 @@ class Posto:
 if __name__ == '__main__':
 
     posto = Posto(ID_POSTO=3, ID_NEVOA=1, BROKER_HOST="172.16.103.14", BROKER_PORT=1884)
+    
+    #posto.desconectar_posto()
