@@ -35,9 +35,9 @@ venv\Scripts\activate
 
 ## Introdução
 
-Nos próximos anos, é esperado o surgimento de bilhões de novos objetos com capacidade de coletar, trocar informações e interagir com o ambiente de maneira inteligente. Contudo, a integração desses elementos para beneficiar simultaneamente diferentes setores da sociedade demanda grandes desafios, como parte do que está sendo chamada a Internet das Coisas. Ambientes de Iot são caracterizados por diferentes tipos de conexão entre dispositivos heterogêneos, dispostos de forma local ou amplamente distribuídos com capacidades de comunicação, armazenamento e processamento limitados. Sua implementação envolve diferentes questões como confiabilidade, performance, segurança e privacidade [Atzori et al. 2010] [Gubbi et al. 2013] [Sehgal et al. 2012].
+Nos próximos anos, é esperado o surgimento de bilhões de novos objetos com capacidade de coletar, trocar informações e interagir com o ambiente de maneira inteligente. Contudo, a integração desses elementos para beneficiar simultaneamente diferentes setores da sociedade demanda grandes desafios, como parte do que está sendo chamada a Internet das Coisas. Ambientes de Iot são caracterizados por diferentes tipos de conexão entre dispositivos heterogêneos, dispostos de forma local ou amplamente distribuídos com capacidades de comunicação, armazenamento e processamento limitados. Sua implementação envolve diferentes questões como confiabilidade, performance, segurança e privacidade [Coutinho et al 2016].
 
-Entre as diferentes propostas sobre Internet das Coisas vem se agregando a Computação em Nuvem e Computação em Névoa, enquanto a Nuvem oferece solução centrada, a Névoa fornece uma solução distribuída. A Computação em Névoa vem atraindo interesse pelo seu potencial de satisfazer requisitos que não são atendidos por um modelo centralizado em Nuvem [Khalid et al. 2016]. Este paradigma estende os recursos computacionais disponíveis na Nuvem para a borda da rede visando apoio às soluções em IoT. Dessa forma, possibilita a execução de aplicativos em bilhões de objetos conectados para fornecer dados, processamento, armazenamento e serviços aos usuários. Sua arquitetura introduz o suporte à análise de dados em tempo real, distribuindo o processamento analítico através dos recursos na Névoa [Bonomi et al. 2014].
+Entre as diferentes propostas sobre Internet das Coisas vem se agregando a Computação em Nuvem e Computação em Névoa, enquanto a Nuvem oferece solução centrada, a Névoa fornece uma solução distribuída. A Computação em Névoa vem atraindo interesse pelo seu potencial de satisfazer requisitos que não são atendidos por um modelo centralizado em Nuvem. Este paradigma estende os recursos computacionais disponíveis na Nuvem para a borda da rede visando apoio às soluções em IoT. Dessa forma, possibilita a execução de aplicativos em bilhões de objetos conectados para fornecer dados, processamento, armazenamento e serviços aos usuários. Sua arquitetura introduz o suporte à análise de dados em tempo real, distribuindo o processamento analítico através dos recursos na Névoa [Coutinho et al 2016].
 
 Pensando nessa tecnologia foi desenvolvido um sistema distribuido para gerênciar filas de postos de recarga para carros elétricos. Onde temos como sistemas finais os carros e os postos, servidores distribuídos por região e uma núvem central que gerencia os servidores distribuidos. A fim de diminuir o tempo de espera para recarga nas ciadades.
 
@@ -104,3 +104,13 @@ Assim temos um sistema que implementa computação em névoa como uma solução 
 O que faz o sistema ser capaz de indicar o posto com menor fila ao carro que faz a requisição. Na possibilidade de não haver postos disponíveis numa área (névoa) para o carro, são feitas novas tentativas até que se encontre num novo posto. Desta forma, os carros são distribuídos de maneira que não acabem sobrecarregando uma área (névoa) com muitos carros, pois logo eles são alocados para outra área (névoa).
 
 O sistema pode ser melhorado posteriormente ao receber dados reais de um sistema embarcado, a fim de que se torne um projeto possível de ser comercializado.
+
+# Referências
+COUTINHO, A. A. T. R.; CARNEIRO, Elisângela Oliveira; GREVE, Fabíola Gonçalves Pereira. Computaçao em névoa: Conceitos, aplicaç oes e desafios. Minicursos do XXXIV SBRC, p. 266-315, 2016.
+
+AMAZON AWS. O que é MQTT?. Disponível em https://aws.amazon.com/pt/what-is/mqtt/#:~:text=O%20MQTT%20%C3%A9%20um%20protocolo,comunica%C3%A7%C3%A3o%20de%20computador%20para%20computador. Acessado em 27/04/2023
+
+[Sehgal et al. 2012] Sehgal, A., Perelman, V., Kuryla, S., and Schönwälder, J. (2012).
+Management of Resource Constrained Devices in the Internet of Things. Communications Magazine, IEEE, 50(12):144–149.
+
+
