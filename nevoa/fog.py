@@ -7,7 +7,6 @@ import json
 import socket
 import threading
 import datetime
-import requests
 
 # fila = quantos carros tem na fila
 # espera = tempo de espera
@@ -19,7 +18,7 @@ postos_disponiveis = {
 
 
 class Fog:
-    def __init__(self, fog_prefix="fog", fog_id=1, postos=postos_disponiveis, host='localhost', http_port=8000, http_host='172.16.103.4'):
+    def __init__(self, fog_prefix="fog", fog_id=1, postos=postos_disponiveis, broker_host='localhost', broker_port=1883, cloud_host='localhost', cloud_port=8000):
         # Prefixo de qual nuvem o carro está no momento
         self.fog_prefix = fog_prefix
         # ID na nevoa
@@ -28,23 +27,27 @@ class Fog:
         self.postos = postos
         # Ponto central entre todos os postos
         self.ponto_central = None
-        self.host = host
-        self.http_host = http_host
-        self.http_port = http_port
+        self.broker_host = broker_host
+        self.broker_port = broker_port
+        self.cloud_host = cloud_host
+        self.cloud_port = cloud_port
         self.connection_to_server = None
 
         self.client = mqtt.Client(client_id=f"Fog {self.fog_id}")
+        print("Teste")
         self.client.on_connect = self.on_connect
         self.client.on_message = self.on_message
-        self.client.connect(host, 1884, 60)
+        self.client.connect(self.broker_host, self.broker_port, 60)
         # self.client.loop_start()
 
         self.connection_thread = threading.Thread(
             target=self._connect_to_cloud, args=[])
         self.connection_thread.start()
+        
         self.client.loop_forever()
 
     def on_connect(self, client, userdata, flags, rc):
+        print("Teste2")
         print(f'Conectado ao Broker! Código de retorno {rc}')
         client.subscribe(
             f"{self.fog_prefix}/{self.fog_id}/{topics.LOW_BATTERY}")
@@ -180,7 +183,7 @@ class Fog:
     def _connect_to_cloud(self):
         current_time = datetime.datetime.now()
         self.connection_to_server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.connection_to_server.connect((self.http_host, self.http_port))
+        self.connection_to_server.connect((self.cloud_host, self.cloud_port))
         print(f"[{current_time}] - Connected to cloud")
 
     def send_car_request_change_fog(self, request):
@@ -201,7 +204,7 @@ class Fog:
         }
         payload = json.dumps(payload, separators=(',', ':'), indent='\t')
         size = len(payload)
-        request = f'POST /cadCliente HTTP/1.1\r\nHost: {self.host}:{self.http_port}\r\nUser-Agent: EsquivelWindows10NT/2022.7.5\r\nContent-Type: application/json\r\nAccept: */*\r\nContent-Length: {size}\r\n\r\n{payload}'
+        request = f'POST /cadCliente HTTP/1.1\r\nHost: {self.cloud_host}:{self.cloud_port}\r\nUser-Agent: EsquivelWindows10NT/2022.7.5\r\nContent-Type: application/json\r\nAccept: */*\r\nContent-Length: {size}\r\n\r\n{payload}'
         return request
 
     def __del__(self):
@@ -225,4 +228,10 @@ class Fog:
 
 
 if __name__ == '__main__':
-    fog = Fog()
+    id = int(input("Insira o id da névoa: "))
+    broker_host = input("Insira o host do broker: ")
+    broker_port = int(input("Insira a porta do broker: "))
+    cloud_host = input("Insira o host da nuvem: ")
+    cloud_port = int(input("Insira a porta da nuvem: "))
+    
+    fog = Fog(id, broker_host, broker_port, cloud_host, cloud_port)
