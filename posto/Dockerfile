@@ -8,4 +8,4 @@ COPY requirements.txt .
 
 RUN pip install -r requirements.txt
 
-CMD ["python","__init__.py"]
+CMD ["python","posto.py"]

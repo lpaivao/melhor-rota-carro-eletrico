@@ -15,8 +15,6 @@ class Posto:
         self.fila = 0
         self.limite_vagas = limite_vagas
 
-        self.BROKER_HOST = BROKER_HOST
-        self.BROKER_PORT = BROKER_PORT
         self.client = client.Client(client_id=f"Posto {self.ID_POSTO}")
         self.client.on_connect = self.on_connect
         self.client.on_message = self.on_message
@@ -120,9 +118,5 @@ class Posto:
 
 if __name__ == '__main__':
     posto = Posto(ID_POSTO=1, BROKER_HOST="172.16.103.14")
-
-    posto.posto_disconnect()
-
-
-
-
+    time.sleep(1)
+    posto.desconectar_posto()

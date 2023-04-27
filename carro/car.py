@@ -26,7 +26,7 @@ def on_timeout(self):
 
 class Car:
     def __init__(self, id_carro, bateria, max_distance_per_charge, melhor_posto=posto, latitude=-23.5450,
-                 longitude=-46.6355, fog_prefix="fog", fog_id=1):
+                 longitude=-46.6355, fog_prefix="fog", fog_id=1, BROKER_HOST="localhost", BROKER_PORT=1883):
         # Prefixo de qual nuvem o carro está no momento
         self.fog_prefix = fog_prefix
         # ID na nevoa
@@ -48,7 +48,7 @@ class Car:
         self.client = mqtt.Client()
         self.client.on_connect = self.on_connect
         self.client.on_message = self.on_message
-        self.client.connect("172.16.103.14", 1883, 60)
+        self.client.connect(BROKER_HOST, BROKER_PORT, 60)
         # Socket para se comunicar com a nuvem
         self.server = None
 
@@ -245,12 +245,8 @@ class Car:
                 lat, lon = random.uniform(-0.0005,
                                           0.0005), random.uniform(-0.0005, 0.0005)
                 self.mover(lat, lon)
-                """
-                    Verifica se a bateria está baixa e se já não 
-                    tem um processamento de envio de bateria baixa
-                """
+                
                 if self.bateria < 15:
-                    #self.envia_bateria_baixa()
                     thread = threading.Thread(
                         target=self.envia_bateria_baixa)
                     thread.start()

@@ -26,12 +26,12 @@ nevoas_var = {
 
 
 class Cloud:
-    def __init__(self, host, port, nevoas=nevoas_var):
+    def __init__(self, host, port, BROKER_HOST="localhost", BROKER_PORT=1883, nevoas=nevoas_var):
         self.nevoas = nevoas
         # Conexão MQTT
         self.client = mqtt.Client()
         self.client.on_connect = self.on_connect
-        self.client.connect('172.16.103.14', 1883, 60)
+        self.client.connect(BROKER_HOST, BROKER_PORT, 60)
 
         # Conexão sock
         self.host = host
