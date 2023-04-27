@@ -218,5 +218,5 @@ class Fog:
 
 
 if __name__ == '__main__':
-    fog = Fog(fog_id=0, broker_host="172.16.103.14", broker_port=1883, cloud_host="172.16.103.14", cloud_port=8001)
+    fog = Fog(fog_id=0, broker_host="172.16.103.14", broker_port=1883, cloud_host="172.16.103.14", cloud_port=8000)
     fog.desconectar_nevoa()
