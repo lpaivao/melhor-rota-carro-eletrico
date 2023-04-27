@@ -103,7 +103,7 @@ Assim temos um sistema que implementa computação em névoa como uma solução 
 
 O que faz o sistema ser capaz de indicar o posto com menor fila ao carro que faz a requisição. Na possibilidade de não haver postos disponíveis numa área (névoa) para o carro, são feitas novas tentativas até que se encontre num novo posto. Desta forma, os carros são distribuídos de maneira que não acabem sobrecarregando uma área (névoa) com muitos carros, pois logo eles são alocados para outra área (névoa).
 
-O sistema pode ser melhorado posteriormente ao receber dados reais de um sistema embarcado, a fim de que se torne um projeto possível de ser comercializado.
+O sistema pode ser melhorado posteriormente ao receber dados reais de um sistema embarcado, a fim de que se torne um projeto possível de ser comercializado. Ainda como melhoria pode ser integrada ao sistema uma interface gráfica que consome os dados disponibilizados pela API dos carros, proporcionando uma melhor visualização da dinâmica do sistema na perspectiva de seus principais usuários. Também como melhoria, na eventual mudança de névoa do carro, a resposta pode ser passada para as névoas que então é repassada, invés de ser enviada diretamente da nuvem ao carro que solicita. Diminuindo um possível overhead de solicitações num futuro escalamento do sistema.
 
 # Referências
 COUTINHO, A. A. T. R.; CARNEIRO, Elisângela Oliveira; GREVE, Fabíola Gonçalves Pereira. Computaçao em névoa: Conceitos, aplicaç oes e desafios. Minicursos do XXXIV SBRC, p. 266-315, 2016.
