@@ -330,6 +330,7 @@ class Car():
                             self.carro_pode_andar = False
                             while not self.carro_pode_andar:
                                 time.sleep(1)
+                            print(threading.activeCount())
 
                         time.sleep(10)
     def start(self):
