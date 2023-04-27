@@ -70,7 +70,7 @@ class Car():
         self.server_socket.listen()'''
 
         #self.http_server = HTTPServer(('localhost',8080),self.RequestHandler)
-        self.http_server = HTTPServer((host, 8080), lambda *args, **kwargs: self.RequestHandler(self, *args, **kwargs))
+        #self.http_server = HTTPServer((host, 8080), lambda *args, **kwargs: self.RequestHandler(self, *args, **kwargs))
 
         self.tcp_look = threading.Lock()
         self.mqtt_look = threading.Lock()
@@ -117,15 +117,9 @@ class Car():
         self.client.subscribe(
             f"{self.fog_prefix}/{self.fog_id}/{topics.BETTER_STATION}/{self.id_carro}")
 
-        # Teste
-        # topico_ocupar_vaga = f"{self.fog_prefix}/{self.fog_id}/increase_line/0"
-        # message = {"id_carro": 1}
-        # self.client.publish(topico_ocupar_vaga, json.dumps(message))
-
     def on_message(self, client, userdata, message):
         json_payload = message.payload.decode('utf-8')
         payload = json.loads(json_payload)
-        print(f"TOPICO:{message.topic}")
 
         # Tópico de melhor posto
         if message.topic == f"{self.fog_prefix}/{self.fog_id}/{topics.BETTER_STATION}/{self.id_carro}":
@@ -205,35 +199,17 @@ class Car():
         payload = json.dumps(payload)
         self.client.publish(topico_pub, payload)
 
-        # Inicia o temporizador
-        # self.timer1 = threading.Timer(30, on_timeout)
-        # self.timer1.start()
-
-        # Tempo até o servidor responder, senão o carro envia outro aviso
-        # time.sleep(60)
-        # Se o carro não estiver tentando ocupar um posto depois de alguns segundos, vai enviar outro aviso de bateria baixa
-        # if not self.tentando_ocupar_posto:
-
     def ocupar_vaga_posto(self, melhor_posto):
         self.tentando_ocupar_posto = True
         # Faz o carro ocupar vaga do posto
         id_posto = str(melhor_posto["id_posto"])
         topico_ocupar_vaga = f"{self.fog_prefix}/{self.fog_id}/increase_line/{id_posto}"
-        # topico_ocupar_vaga = f"{self.fog_prefix}/{self.fog_id}/increase_line/0"
         payload = {
             "id_carro": self.id_carro
         }
         payload = json.dumps(payload)
         self.client.publish(topico_ocupar_vaga, payload)
         print(f"Mensagem de ocupar vaga publicada em {topico_ocupar_vaga}")
-
-        # Tempo limite de resposta
-        # time.sleep(5)
-        # if self.tentando_ocupar_posto:
-        #    print(f"Tempo de espera de resposta atingiu o limite, sem resposta do posto {id_posto}")
-        #    self.encontrar_outro_posto(id_posto)
-        # else:
-        #    print("else")
 
     def encontrar_outro_posto(self, id_posto):
         print(f"Tentando encontrar outro posto...")
@@ -313,26 +289,25 @@ class Car():
 
     def run(self):
        # with self.mqtt_look:
-                    while self.bateria > 0:
-                        # Simula o carro andando aleatoriamente as coordenadas
-                        lat, lon = random.uniform(-0.0005,
-                                                0.0005), random.uniform(-0.0005, 0.0005)
-                        self.mover(lat, lon)
-                        """
-                            Verifica se a bateria está baixa e se já não 
-                            tem um processamento de envio de bateria baixa
-                        """
-                        if self.bateria < 15:
-                            #self.envia_bateria_baixa()
-                            thread = threading.Thread(
-                                target=self.envia_bateria_baixa)
-                            thread.start()
-                            self.carro_pode_andar = False
-                            while not self.carro_pode_andar:
-                                time.sleep(1)
-                            print(threading.activeCount())
+        while self.bateria > 0:
+            # Simula o carro andando aleatoriamente as coordenadas
+            lat, lon = random.uniform(-0.0005,
+                                    0.0005), random.uniform(-0.0005, 0.0005)
+            self.mover(lat, lon)
+            """
+                Verifica se a bateria está baixa e se já não 
+                tem um processamento de envio de bateria baixa
+            """
+            if self.bateria < 15:
+                #self.envia_bateria_baixa()
+                thread = threading.Thread(
+                    target=self.envia_bateria_baixa)
+                thread.start()
+                self.carro_pode_andar = False
+                while not self.carro_pode_andar:
+                    time.sleep(1)
 
-                        time.sleep(10)
+            time.sleep(3)
     def start(self):
         self.http_server.serve_forever()
 
@@ -340,24 +315,19 @@ class Car():
          self.http_server.shutdown()
         
     def drive(self):
-        while True:
-            thread_tcp = threading.Thread(target=self.start)
-            thread_tcp.start()
+        #thread_tcp = threading.Thread(target=self.start)
+        #thread_tcp.start()
 
-            thread_mqtt = threading.Thread(target=self.run)
-            thread_mqtt.start()
+        thread_mqtt = threading.Thread(target=self.run)
+        thread_mqtt.start()
 
-            #thread_mqtt.join()
-            #thread_tcp.join()
+        #thread_mqtt.join()
+        #thread_tcp.join()
             
             
 
 if __name__ == '__main__':
     
-    id = int(input("Insira o id do carro: "))
-    bateria = int(input("Insira o nivel inicial de carga da bateria: "))
-    max_distance = int(input("Insira a distância máxima que o carro pode percorrer até ficar sem bateria (autonomia): "))
-    
-    carro = Car(id, bateria, max_distance)
+    carro = Car(id_carro=1, bateria=16, max_distance_per_charge=200, broker_host="localhost", broker_port=1883)
     carro.drive()
     

@@ -7,7 +7,7 @@ import functions
 
 
 class Posto:
-    def __init__(self, ID_POSTO, lat=-23.5440, lgn=-46.6340, ID_NEVOA=1, BROKER_HOST="localhost", BROKER_PORT=1883, limite_vagas=5):
+    def __init__(self, ID_POSTO, lat=-23.5440, lgn=-46.6340, ID_NEVOA=1, BROKER_HOST="172.16.103.3", BROKER_PORT=1884, limite_vagas=5):
         self.ID_POSTO = ID_POSTO
         self.ID_NEVOA = ID_NEVOA
         self.latitude = lat
@@ -23,7 +23,6 @@ class Posto:
         self.client.connect(BROKER_HOST, BROKER_PORT, 60)
 
         self.__STATUS = f'fog/{self.ID_NEVOA}/vaga_status/{self.ID_POSTO}'
-        # self.__BETTER_STATION = f'Nevoa/{self.ID_NEVOA}/Better_station'
         self.__INCREASE_LINE = f'fog/{self.ID_NEVOA}/increase_line/{self.ID_POSTO}'
         self.__ALOC = f'fog/{self.ID_NEVOA}/alocando_carro/{self.ID_POSTO}'
 
@@ -41,13 +40,13 @@ class Posto:
     def on_connect(self, client, usardata, flags, rc):
         print(f"Posto {self.ID_POSTO}")
         print("Conectado")
-       # self.client.subscribe(self.__BETTER_STATION)
         self.client.subscribe(self.__INCREASE_LINE)
         self.client.publish(self.__STATUS, json.dumps({
             "id_posto": self.ID_POSTO,
             "fila": self.fila,
             "conectado": True
         }))
+        thread = threading.Thread(target=self.desconectar_posto)
 
     def on_message(self, client, data, message):
         topic = message.topic.split("/")
@@ -121,13 +120,4 @@ class Posto:
 
 if __name__ == '__main__':
 
-    id = int(input("Insira o id do posto: "))
-    lat = float(input("Insira a latitude do posto: "))
-    lgn = float(input("Insira a longitude do posto: "))
-    id_nevoa = int(input("Insira o id da nevoa associada: "))
-    host = input("Insira o host do broker: ")
-    port = int(input('Insira a porta do broker: '))
-
-    posto = Posto(id,lat,lgn,id_nevoa,BROKER_HOST=host,BROKER_PORT=port)
-
-    posto.posto_disconnect()
+    posto = Posto(ID_POSTO=1, ID_NEVOA=1, BROKER_HOST="localhost", BROKER_PORT=1883)

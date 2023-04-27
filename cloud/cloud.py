@@ -8,16 +8,16 @@ from geopy import Point
 import paho.mqtt.client as mqtt
 import functions
 
-app = Flask(__name__)
-api = Api(app)
+#app = Flask(__name__)
+#api = Api(app)
 
 
-class Hello(Resource):
-    def get(self):
-        return {'hello': 'world'}
+#class Hello(Resource):
+#    def get(self):
+#        return {'hello': 'world'}
 
 
-api.add_resource(Hello, '/')
+#api.add_resource(Hello, '/')
 
 
 nevoas_var = {
@@ -28,7 +28,7 @@ nevoas_var = {
 
 
 class Cloud:
-    def __init__(self, id, host="localhost", port=8001, nevoas=nevoas_var):
+    def __init__(self, id, host="localhost", port=8000, broker_host="172.16.103.3", broker_port=1884, nevoas=nevoas_var):
         self.id = id
         self.nevoas = nevoas
 
@@ -37,7 +37,7 @@ class Cloud:
         self.client.on_connect = self.on_connect
 
         try:
-            self.client.connect('172.16.103.3', 1884, 60)
+            self.client.connect(broker_host, broker_port, 60)
         except ConnectionRefusedError as e:
             print(e)
             print("Não foi possível conectar ao Broker MQTT")
@@ -124,7 +124,5 @@ class Cloud:
 
 
 if __name__ == '__main__':
-    HOST = host = socket.gethostbyname(socket.gethostname())
-    PORT = 8001
-    my_cloud = Cloud(1, HOST, PORT)
-    app.run(port=5001)
+    my_cloud = Cloud(id=1, host="localhost", port=8000, broker_host="localhost", broker_port=1883)
+    #app.run(port=5001)
