@@ -120,4 +120,4 @@ class Posto:
 
 if __name__ == '__main__':
 
-    posto = Posto(ID_POSTO=1, ID_NEVOA=0, BROKER_HOST="172.16.103.14", BROKER_PORT=1883)
+    posto = Posto(ID_POSTO=3, ID_NEVOA=1, BROKER_HOST="172.16.103.14", BROKER_PORT=1884)

@@ -21,9 +21,8 @@ import functions
 
 
 nevoas_var = {
-    "0": {"fog_id": 0, "ponto_central": Point(-23.5450, -46.6350), "conectado": False},
-    "1": {"fog_id": 1, "ponto_central": Point(-23.5600, -46.6600), "conectado": False},
-    "2": {"fog_id": 2, "ponto_central": Point(-23.5480, -46.6380), "conectado": False}
+    "0": {"fog_id": 0, "ponto_central": Point(-23.5450, -46.6350), "conectado": True},
+    "1": {"fog_id": 1, "ponto_central": Point(-23.5600, -46.6600), "conectado": True},
 }
 
 
@@ -129,5 +128,5 @@ class Cloud:
 
 
 if __name__ == '__main__':
-    my_cloud = Cloud(id=1, host="localhost", port=8000, broker_host="172.16.103.14", broker_port=1883)
+    my_cloud = Cloud(id=1, host=socket.gethostbyname(socket.gethostname()), port=8001, broker_host="172.16.103.14", broker_port=1884)
     #app.run(port=5001)

@@ -63,17 +63,12 @@ class Car():
         self.melhor_posto = melhor_posto
 
         #tcp
-        '''
-        self.server_socket = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-        self.__run_server = True
-        self.server_socket.bind(("localhost",8035))
-        self.server_socket.listen()'''
+    
 
         #self.http_server = HTTPServer(('localhost',8080),self.RequestHandler)
-        #self.http_server = HTTPServer((host, 8080), lambda *args, **kwargs: self.RequestHandler(self, *args, **kwargs))
+        self.http_server = HTTPServer((host, 14000), lambda *args, **kwargs: self.RequestHandler(self, *args, **kwargs))
 
-        self.tcp_look = threading.Lock()
-        self.mqtt_look = threading.Lock()
+     
 
         self.carro_pode_andar = False
         self.posto_respondeu = False
@@ -151,7 +146,7 @@ class Car():
             self.carro_pode_andar = True
 
         # Tópico de mudança de névoa
-        elif message.topic == f"cloud/{topics.FOG_CHANGE}/{self.fog_id}":
+        elif message.topic == f"cloud/{topics.FOG_CHANGE}/{self.id_carro}":
             # Desinscreve do tópico da névoa antiga de melhor posto
             try:
                 self.client.unsubscribe(
@@ -328,6 +323,7 @@ class Car():
 
 if __name__ == '__main__':
     
-    carro = Car(id_carro=1, fog_id=0, bateria=20, max_distance_per_charge=200, broker_host="172.16.103.14", broker_port=1883)
+    carro = Car(id_carro=4, fog_id=1, bateria=20, max_distance_per_charge=200, broker_host="172.16.103.14", broker_port=1884)
+    time.sleep(1)
     carro.drive()
     

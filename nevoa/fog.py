@@ -174,6 +174,7 @@ class Fog:
             current_time = datetime.datetime.now()
             print(
                 f"[{current_time}] - Connected to cloud no endereço ({self.cloud_host}:{self.cloud_port})")
+            self.conectar_nevoa()
         except Exception as e:
             print(f"Falha em conectar em {self.cloud_host}:{self.cloud_port}")
             print(e)
@@ -201,6 +202,16 @@ class Fog:
 
     def __del__(self):
         self.connection_thread.join()
+        
+    def conectar_nevoa(self):
+        payload = {
+            "fog_id": str(self.fog_id),
+            "conectado": True
+        }
+
+        payload = json.dumps(payload)
+
+        self.server.sendall(payload.encode())
 
     def desconectar_nevoa(self):
         while True:
@@ -208,7 +219,7 @@ class Fog:
                 pass
             except KeyboardInterrupt:
                 payload = {
-                    "fog_id": self.fog_id,
+                    "fog_id": str(self.fog_id),
                     "conectado": False
                 }
 
@@ -218,5 +229,5 @@ class Fog:
 
 
 if __name__ == '__main__':
-    fog = Fog(fog_id=0, broker_host="172.16.103.14", broker_port=1883, cloud_host="172.16.103.14", cloud_port=8000)
+    fog = Fog(fog_id=1, broker_host="172.16.103.14", broker_port=1884, cloud_host="172.16.103.14", cloud_port=8001)
     fog.desconectar_nevoa()
