@@ -54,7 +54,7 @@ Por fim, a Nuvem, que atua como um servidor central que gerencia os servidores d
 <div id="image11" style="display: inline_block" align="center">
 		<img src="/imagens/comunicacao.png"/><br>
 		<p>
-		Imagem 2 - Estrutura do Projeto
+		Imagem 1 - Estrutura do Projeto
 		</p>
 	</div>
 	
@@ -94,7 +94,7 @@ Existem duas situações possíveis para funcionamento do programa:
 <div id="image11" style="display: inline_block" align="center">
 		<img src="/imagens/sequencia.png"/><br>
 		<p>
-		Imagem 3 - Diagrama Sequencial
+		Imagem 2 - Diagrama Sequencial
 		</p>
 	</div>
 
