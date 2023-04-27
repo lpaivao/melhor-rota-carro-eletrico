@@ -99,4 +99,8 @@ Existem duas situações possíveis para funcionamento do programa:
 	</div>
 
 # Conclusão
-O software é capaz de indicar o posto com menor fila ao carro que faz a requisição. Na possibilidade de não haver postos disponíveis numa área (névoa) para o carro, são feitas novas tentativas até que se encontre num novo posto. Desta forma, os carros são distribuídos de maneira que não acabem sobrecarregando uma área (névoa) com muitos carros, pois logo eles são alocados para outra área (névoa).
+Assim temos um sistema que implementa computação em névoa como uma solução para um gerenciador de filas de postos para recarga de carros elétricos, a fim de diminuir o tempo de espera dos motoristas. Por meio de quatro módulos: névoa, nuvem, carro e o posto.
+
+O que faz o sistema ser capaz de indicar o posto com menor fila ao carro que faz a requisição. Na possibilidade de não haver postos disponíveis numa área (névoa) para o carro, são feitas novas tentativas até que se encontre num novo posto. Desta forma, os carros são distribuídos de maneira que não acabem sobrecarregando uma área (névoa) com muitos carros, pois logo eles são alocados para outra área (névoa).
+
+O sistema pode ser melhorado posteriormente ao receber dados reais de um sistema embarcado, a fim de que se torne um projeto possível de ser comercializado.
