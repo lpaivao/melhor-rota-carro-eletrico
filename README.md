@@ -110,7 +110,6 @@ COUTINHO, A. A. T. R.; CARNEIRO, Elisângela Oliveira; GREVE, Fabíola Gonçalve
 
 AMAZON AWS. O que é MQTT?. Disponível em https://aws.amazon.com/pt/what-is/mqtt/#:~:text=O%20MQTT%20%C3%A9%20um%20protocolo,comunica%C3%A7%C3%A3o%20de%20computador%20para%20computador. Acessado em 27/04/2023
 
-[Sehgal et al. 2012] Sehgal, A., Perelman, V., Kuryla, S., and Schönwälder, J. (2012).
-Management of Resource Constrained Devices in the Internet of Things. Communications Magazine, IEEE, 50(12):144–149.
+
 
 
