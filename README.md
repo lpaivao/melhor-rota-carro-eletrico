@@ -26,19 +26,22 @@ Em Windows:
 venv\Scripts\activate
 ```
 
-Carregando variaveis de ambiente no Flask, Windows e executando:
 
-```
-$env:FLASK_APP = "main.py"
-$env:FLASK_DEBUG = 1
-$env:FLASK_ENV= development
-flask run
-```
 ## Problema - Carregamento inteligente de veículos elétricos
 - Desenvolver um software para orientar de forma automática motoristas de carro elétrico para o melhor posto possível. Dessa forma, seria possível que a demanda nos postos fosse distribuída, diminuindo assim a possibilidade de um posto sobrecarregar e consequentemente diminuindo o tempo de espera de recarga dos veículos.
 
 ### Requisitos
 - [x] Requisito 1
+
+## Introdução
+
+Nos próximos anos, é esperado o surgimento de bilhões de novos objetos com capacidade de coletar, trocar informações e interagir com o ambiente de maneira inteligente. Contudo, a integração desses elementos para beneficiar simultaneamente diferentes setores da sociedade demanda grandes desafios, como parte do que está sendo chamada a Internet das Coisas. Ambientes de Iot são caracterizados por diferentes tipos de conexão entre dispositivos heterogêneos, dispostos de forma local ou amplamente distribuídos com capacidades de comunicação, armazenamento e processamento limitados. Sua implementação envolve diferentes questões como confiabilidade, performance, segurança e privacidade [Atzori et al. 2010] [Gubbi et al. 2013] [Sehgal et al. 2012].
+
+Entre as diferentes propostas sobre Internet das Coisas vem se agregando a Computação em Nuvem e Computação em Névoa, enquanto a Nuvem oferece solução centrada, a Névoa fornece uma solução distribuída. A Computação em Névoa vem atraindo interesse pelo seu potencial de satisfazer requisitos que não são atendidos por um modelo centralizado em Nuvem [Khalid et al. 2016]. Este paradigma estende os recursos computacionais disponíveis na Nuvem para a borda da rede visando apoio às soluções em IoT. Dessa forma, possibilita a execução de aplicativos em bilhões de objetos conectados para fornecer dados, processamento, armazenamento e serviços aos usuários. Sua arquitetura introduz o suporte à análise de dados em tempo real, distribuindo o processamento analítico através dos recursos na Névoa [Bonomi et al. 2014].
+
+Pensando nessa tecnologia foi desenvolvido um sistema distribuido para gerênciar filas de postos de recarga para carros elétricos. Onde temos como sistemas finais os carros e os postos, servidores distribuídos por região e uma núvem central que gerencia os servidores distribuidos.
+
+
 
 ## Metodologia
 
