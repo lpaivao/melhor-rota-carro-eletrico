@@ -1,5 +1,3 @@
-import sys
-import selectors
 import json
 import time
 from flask import Flask
@@ -9,7 +7,6 @@ import threading
 from geopy import Point
 import paho.mqtt.client as mqtt
 import functions
-import libcloud
 
 app = Flask(__name__)
 api = Api(app)
@@ -49,14 +46,10 @@ class Cloud:
         self.host = host
         self.port = port
 
-        self.lsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.lsock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.lsock.bind((self.host, self.port))
-        self.lsock.listen()
-        print(f"Cloud is listening on {(self.host, self.port)}")
-        
-        self.lsock.setblocking(False)
-        sel.register(self.lsock, selectors.EVENT_READ, data=None)
+        self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.s.bind((self.host, self.port))
+        self.s.listen()
 
         self.sentinelthread = threading.Thread(
             target=self._handle_conn, args=[self.s])
@@ -71,34 +64,9 @@ class Cloud:
         self.client.subscribe(topic_sub)
 
     def _handle_conn(self, socket):
+        while True:
             conn, addr = socket.accept()
-            print(f"Accepted connection from {addr}")
-            conn.setblocking(False)
-            message = libcloud.Message(sel, conn, addr)
-            sel.register(conn, selectors.EVENT_READ, data=message)
-            
             self._fognodes.append(conn)
-            try:
-                while True:
-                    events = sel.select(timeout=None)
-                    for key, mask in events:
-                        if key.data is None:
-                            _handle_conn(key.fileobj)
-                        else:
-                            message = key.data
-                            try:
-                                message.process_events(mask)
-                            except Exception:
-                                print(
-                                    f"Main: Error: Exception for {message.addr}:\n"
-                                    f"{traceback.format_exc()}"
-                                )
-                                message.close()
-            except KeyboardInterrupt:
-                print("Caught keyboard interrupt, exiting")
-            finally:
-                sel.close()
-            
             thread = threading.Thread(
                 target=self._handle_fognode, args=[conn, addr])
             thread.start()
@@ -106,6 +74,8 @@ class Cloud:
     def _handle_fognode(self, connection, address):
         with connection:
             # Aqui ocorre o processo de trocar o carro de nó
+            print("A new connection was made!")
+            print(connection)
             while True:
                 try:
                     data = connection.recv(1024)
@@ -154,10 +124,7 @@ class Cloud:
 
 
 if __name__ == '__main__':
-    
-    host, port = sys.argv[1], int(sys.argv[2])
     HOST = host = socket.gethostbyname(socket.gethostname())
     PORT = 8001
     my_cloud = Cloud(1, HOST, PORT)
     app.run(port=5001)
-
